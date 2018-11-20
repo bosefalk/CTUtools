@@ -107,7 +107,7 @@ HLA_C_classification = function(allele_c1, allele_c2, nchar = 5){
   # Logic for determining joint group, if either allele was not possible to classify returns NA
   if (any(is.na(c(c1, c2)))) return(NA_character_)
   if (c1 == "C2" & c2 == "C2") return("C2/C2")
-  if ((c1 == "C2" & c1 == "C1") | (c1 == "C1" & c1 == "C2")) return("C1/C2")
+  if ((c1 == "C2" & c2 == "C1") | (c1 == "C1" & c2 == "C2")) return("C1/C2")
   if (c1 == "C1" & c2 == "C1") return("C1/C1")
   else {return(NA_character_)}
 }

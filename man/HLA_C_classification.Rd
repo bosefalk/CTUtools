@@ -15,11 +15,15 @@ For example, if allel_c1 = "02:03", nchar should be 5. Default value is 5, for t
 \item{allel_c2}{Allele, as string - same length as \code{allel_c1}}
 }
 \value{
-One of three C1/C2 groups, as string
+One of "C1/C1", "C1/C2", "C2/C2", or \code{NA_character_}, as a string
 }
 \description{
 Takes two HLA-C alleles, classifies them individually into C1 or C2 using \code{\link{HLA_Classification}} and \code{\link{HLA_C_class_data}},
 and returns the joint C1/C1, C1/C2 or C2/C2 class. If either allel classification is unknown, returns NA.
+}
+\details{
+There are only three outcome classes, C1/C1, C1/C2 and C2/C2. The location of each C-class before or after the "/" does not
+match the input \code{allele_c1} and \code{_c2} - in other words if \code{allele_c1 = "C2"} and \code{allele_c2 = "C1"} the result is still C1/C2
 }
 \examples{
 HLA_C_classification("01:02", "01:AWFCH")

@@ -90,7 +90,10 @@ HLA_Classification = function(allele,HLA_x_class){
 #' @param nchar Number of characters from allele string reference document to use, should be same as length as \code{allel_c1}.
 #' For example, if allel_c1 = "02:03", nchar should be 5. Default value is 5, for the first two fields.
 #'
-#' @return One of three C1/C2 groups, as string
+#' @return One of "C1/C1", "C1/C2", "C2/C2", or \code{NA_character_}, as a string
+#'
+#' @details There are only three outcome classes, C1/C1, C1/C2 and C2/C2. The location of each C-class before or after the "/" does not
+#' match the input \code{allele_c1} and \code{_c2} - in other words if \code{allele_c1 = "C2"} and \code{allele_c2 = "C1"} the result is still C1/C2
 #'
 #' @seealso \code{\link{HLA_Classification}}, \code{\link{HLA_C_class_data}}, \code{\link{NMDP}}
 #'

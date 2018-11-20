@@ -9,11 +9,11 @@ HLA_Classification(allele, HLA_x_class)
 \arguments{
 \item{allele}{An allele string, including ":" characers but not the initial "C*"}
 
-\item{HLA_x_class}{HLA classification reference data.frame (such as constructed by for example \code{HLA_C_class_load()}), where
-the number of fields is the same as in \code{allele}}
+\item{HLA_x_class}{HLA classification reference data.frame (such as constructed by for example \code{HLA_C_class_load()}), must
+contain columns Allele (where the number of fields is the same as in \code{allele}) and Class.}
 }
 \value{
-String with  classification group from reference document, NA if unknown
+String with classification group from reference document, NA if unknown
 }
 \description{
 Classifies an allele according to a reference dataframe. If an NMDP code is present, class is given if all possible
@@ -23,7 +23,10 @@ alleles are the same class, otherwise returns NA
 HLA_C_class <- HLA_C_class_load()
 HLA_Classification("01:02", HLA_C_class)
 HLA_Classification("01:AWFCH", HLA_C_class)
+HLA_B_class <- HLA_B_class_load()
+HLA_Classification("07:02", HLA_B_class)
 }
 \seealso{
-\code{\link{HLA_C_class_data}}, \code{\link{NMDP}}
+\code{\link{HLA_C_classification}}, \code{\link{HLA_B_classification}},
+\code{\link{HLA_C_class_load}}, \code{\link{HLA_B_class_load}}, \code{\link{NMDP}}
 }

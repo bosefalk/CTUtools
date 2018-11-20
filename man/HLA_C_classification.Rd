@@ -30,5 +30,5 @@ match the input \code{allele_c1} and \code{_c2} - in other words if \code{allele
 HLA_C_classification("01:02", "01:AWFCH")
 }
 \seealso{
-\code{\link{HLA_Classification}}, \code{\link{HLA_C_class_data}}, \code{\link{NMDP}}
+\code{\link{HLA_Classification}}, \code{\link{HLA_C_class_data}}
 }

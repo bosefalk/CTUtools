@@ -18,6 +18,6 @@ HLA_C_class_data
 Classification database of HLA-C Ligands from Alleles, from Immuno Polymorphism Database
 }
 \seealso{
-\code{\link{HLA_C_class_load}}
+\code{\link{HLA_C_class_load}}, \code{\link{HLA_C_classification}}
 }
 \keyword{datasets}

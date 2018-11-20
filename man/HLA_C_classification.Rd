@@ -4,26 +4,31 @@
 \alias{HLA_C_classification}
 \title{Classify HLA-C alleles into C1 & C2 groups}
 \usage{
-HLA_C_classification(allele_c1, allele_c2, nchar = 5)
+HLA_C_classification(allele_c1, allele_c2, fields = 2)
 }
 \arguments{
-\item{nchar}{Number of characters from allele string reference document to use, should be same as length as \code{allel_c1}.
-For example, if allel_c1 = "02:03", nchar should be 5. Default value is 5, for the first two fields.}
+\item{fields}{Number of fields from allele string reference document to use, should be same as number of fields in \code{allel_c1}.
+For example, if allel_c1 = "02:03", fields should be 2 (the default value). This does not actually apply
+any string manipulation to \code{allele_c1} & \code{c2}, which needs to be done before passing to this function.}
 
 \item{allel_c1}{Allele, as string}
 
-\item{allel_c2}{Allele, as string - same length as \code{allel_c1}}
+\item{allel_c2}{Allele, as string}
 }
 \value{
-One of three C1/C2 groups, as string
+One of "C1/C1", "C1/C2", "C2/C2", or \code{NA_character_}, as a string
 }
 \description{
 Takes two HLA-C alleles, classifies them individually into C1 or C2 using \code{\link{HLA_Classification}} and \code{\link{HLA_C_class_data}},
 and returns the joint C1/C1, C1/C2 or C2/C2 class. If either allel classification is unknown, returns NA.
 }
+\details{
+There are only three outcome classes, C1/C1, C1/C2 and C2/C2. The location of each C-class before or after the "/" does not
+match the input \code{allele_c1} and \code{_c2} - in other words if \code{allele_c1 = "C2"} and \code{allele_c2 = "C1"} the result is still C1/C2
+}
 \examples{
 HLA_C_classification("01:02", "01:AWFCH")
 }
 \seealso{
-\code{\link{HLA_Classification}}, \code{\link{HLA_C_class_data}}, \code{\link{NMDP}}
+\code{\link{HLA_Classification}}, \code{\link{HLA_C_class_data}}
 }

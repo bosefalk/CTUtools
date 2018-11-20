@@ -1,0 +1,14 @@
+
+Remove fields from HLA_C_data_load functions
+
+HLA_B classes can't be overall class, must record it in the same way as C1/C2 classification
+
+Some HLA_A alleles have Bw motifs, must take those into considerations when classifying HLA_B into the new class (add as option to function?)
+
+NMDP codes looks at second field only (in HLA_Classification)
+
+HLA_C and HLA_B_classification functions: Add input validation that allele strings are right format
+
+shorten_allele fields > 2 check if it works on NMDP fields
+
+HLA_A classification any A11 or A3

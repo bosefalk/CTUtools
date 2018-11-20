@@ -26,9 +26,6 @@ HLA_C_class_load <- function(nchar = 5) {
   HLA_C_class_data = HLA_C_class_data[,-3]
   names(HLA_C_class_data) = c("Allele","Class")
   HLA_C_class_data = subset(HLA_C_class_data, Class != "Unclassified") #alle unclassified raus
-  # HLA_C_class_data$Class = as.numeric(gsub("C*", "", HLA_C_class_data$`Predicted Ligand`))
-  # HLA_C_class_data <- subset(HLA_C_class_data, select = -`Predicted Ligand`)
-  # HLA_C_class_data$Class = as.numeric(HLA_C_class_data$Class)
   HLA_C_class_data$Class <- as.character(HLA_C_class_data$Class)
 
   return(HLA_C_class_data)
@@ -53,7 +50,7 @@ HLA_C_class_load <- function(nchar = 5) {
 #' HLA_Classification("01:AWFCH", HLA_C_class)
 HLA_Classification = function(allele,HLA_x_class){
 
-  #data("data/NMDP.Rdata")
+  #data(NMDP")
 
   xx = allele
 

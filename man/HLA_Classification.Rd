@@ -7,9 +7,10 @@
 HLA_Classification(allele, HLA_x_class)
 }
 \arguments{
-\item{HLA_x_class}{HLA classification reference data.frame (such as constructed by for example \code{HLA_C_class_load()})}
+\item{allele}{An allele string, including ":" characers but not the initial "C*"}
 
-\item{allel}{An allele string, including ":" characers but not the initial "C*"}
+\item{HLA_x_class}{HLA classification reference data.frame (such as constructed by for example \code{HLA_C_class_load()}), where
+the number of fields is the same as in \code{allele}}
 }
 \value{
 String with  classification group from reference document, NA if unknown

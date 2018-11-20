@@ -4,15 +4,16 @@
 \alias{HLA_C_classification}
 \title{Classify HLA-C alleles into C1 & C2 groups}
 \usage{
-HLA_C_classification(allele_c1, allele_c2, nchar = 5)
+HLA_C_classification(allele_c1, allele_c2, fields = 2)
 }
 \arguments{
-\item{nchar}{Number of characters from allele string reference document to use, should be same as length as \code{allel_c1}.
-For example, if allel_c1 = "02:03", nchar should be 5. Default value is 5, for the first two fields.}
+\item{fields}{Number of fields from allele string reference document to use, should be same as number of fields in \code{allel_c1}.
+For example, if allel_c1 = "02:03", fields should be 2 (the default value). This does not actually apply
+any string manipulation to \code{allele_c1} & \code{c2}, which needs to be done before passing to this function.}
 
 \item{allel_c1}{Allele, as string}
 
-\item{allel_c2}{Allele, as string - same length as \code{allel_c1}}
+\item{allel_c2}{Allele, as string}
 }
 \value{
 One of "C1/C1", "C1/C2", "C2/C2", or \code{NA_character_}, as a string

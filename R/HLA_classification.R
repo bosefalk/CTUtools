@@ -4,8 +4,8 @@
 #' Loads the HLA-C C1/C2 ligand classification database, and keeps the specified first number
 #' of allele fields / characters. Removes all "Unclassified" entries in the source data.
 #'
-#' @param nchar Number of characters in the allele to keep (after removing the inital "C*", but including ":").
-#' Default is \code{nchar} = 5, which gives the first two fields (i.e. 02:05)
+#' @param fields Number of fields in the allele to keep (see \code{\link{shorten_allele}}).
+#' Default is to keep the first two fields (i.e. 02:05)
 #'
 #' @return A data.frame with columns "Allele" and "Predicted Ligand"
 #' @seealso \code{\link{HLA_C_class_data}}
@@ -13,14 +13,15 @@
 #' @examples
 #' # Default with two fields
 #' head(HLA_C_class_load())
-#' # Only the first field
-#' head(HLA_C_class_load(nchar = 2))
-HLA_C_class_load <- function(nchar = 5) {
+#' # With three fields
+#' head(HLA_C_class_load(fields = 3))
+HLA_C_class_load <- function(fields = 2) {
 
   #data(HLA_C_class_data)
 
-  HLA_C_class_data$Allele = substring(HLA_C_class_data$Allele,first=3) #Ohne C*
-  HLA_C_class_data$Allele = substring(HLA_C_class_data$Allele, 1, nchar)
+  HLA_C_class_data$Allele = substring(HLA_C_class_data$Allele,first=3) # Remove C*
+  #HLA_C_class_data$Allele = substring(HLA_C_class_data$Allele, 1, nchar)
+  HLA_C_class_data$Allele = sapply(HLA_C_class_data$Allele, FUN = shorten_allele, fields = fields) # from R/munging.R
   HLA_C_class_data = as.data.frame(table(HLA_C_class_data$Allele,HLA_C_class_data$`Predicted Ligand`))
   HLA_C_class_data = HLA_C_class_data[HLA_C_class_data[,3]>=1,]
   HLA_C_class_data = HLA_C_class_data[,-3]
@@ -37,8 +38,9 @@ HLA_C_class_load <- function(nchar = 5) {
 #' Classifies an allele according to a reference dataframe. If an NMDP code is present, class is given if all possible
 #' alleles are the same class, otherwise returns NA
 #'
-#' @param allel An allele string, including ":" characers but not the initial "C*"
-#' @param HLA_x_class HLA classification reference data.frame (such as constructed by for example \code{HLA_C_class_load()})
+#' @param allele An allele string, including ":" characers but not the initial "C*"
+#' @param HLA_x_class HLA classification reference data.frame (such as constructed by for example \code{HLA_C_class_load()}), where
+#' the number of fields is the same as in \code{allele}
 #'
 #' @return String with  classification group from reference document, NA if unknown
 #'
@@ -86,9 +88,10 @@ HLA_Classification = function(allele,HLA_x_class){
 #' and returns the joint C1/C1, C1/C2 or C2/C2 class. If either allel classification is unknown, returns NA.
 #'
 #' @param allel_c1 Allele, as string
-#' @param allel_c2 Allele, as string - same length as \code{allel_c1}
-#' @param nchar Number of characters from allele string reference document to use, should be same as length as \code{allel_c1}.
-#' For example, if allel_c1 = "02:03", nchar should be 5. Default value is 5, for the first two fields.
+#' @param allel_c2 Allele, as string
+#' @param fields Number of fields from allele string reference document to use, should be same as number of fields in \code{allel_c1}.
+#' For example, if allel_c1 = "02:03", fields should be 2 (the default value). This does not actually apply
+#' any string manipulation to \code{allele_c1} & \code{c2}, which needs to be done before passing to this function.
 #'
 #' @return One of "C1/C1", "C1/C2", "C2/C2", or \code{NA_character_}, as a string
 #'
@@ -99,10 +102,10 @@ HLA_Classification = function(allele,HLA_x_class){
 #'
 #' @examples
 #' HLA_C_classification("01:02", "01:AWFCH")
-HLA_C_classification = function(allele_c1, allele_c2, nchar = 5){
+HLA_C_classification = function(allele_c1, allele_c2, fields = 2){
 
   # TODO: Add verification input allele string are same length and structure as nchar
-  HLA_C_class_data <- HLA_C_class_load(nchar = nchar)
+  HLA_C_class_data <- HLA_C_class_load(fields = fields)
 
   c1 <- HLA_Classification(allele_c1, HLA_C_class_data)
   c2 <- HLA_Classification(allele_c2, HLA_C_class_data)

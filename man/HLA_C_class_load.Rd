@@ -4,11 +4,11 @@
 \alias{HLA_C_class_load}
 \title{Load HLA-C Ligand Classification}
 \usage{
-HLA_C_class_load(nchar = 5)
+HLA_C_class_load(fields = 2)
 }
 \arguments{
-\item{nchar}{Number of characters in the allele to keep (after removing the inital "C*", but including ":").
-Default is \code{nchar} = 5, which gives the first two fields (i.e. 02:05)}
+\item{fields}{Number of fields in the allele to keep (see \code{\link{shorten_allele}}).
+Default is to keep the first two fields (i.e. 02:05)}
 }
 \value{
 A data.frame with columns "Allele" and "Predicted Ligand"
@@ -20,8 +20,8 @@ of allele fields / characters. Removes all "Unclassified" entries in the source 
 \examples{
 # Default with two fields
 head(HLA_C_class_load())
-# Only the first field
-head(HLA_C_class_load(nchar = 2))
+# With three fields
+head(HLA_C_class_load(fields = 3))
 }
 \seealso{
 \code{\link{HLA_C_class_data}}

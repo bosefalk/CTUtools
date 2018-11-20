@@ -186,5 +186,5 @@ HLA_B_classification = function(allele_b1, allele_b2, fields = 2){
   if (any(c(b1, b2) == "Bw4 - 80I")) {return("Bw4 - 80I")}
   if (any(c(b1, b2) == "Bw4 - 80T")) {return("Bw4 - 80T")}
   if (all(c(b1, b2) == "Bw6")) {return("Bw6")}
-  # TODO: not catching anything with else - if any of the above conditions don't match I want an error
+
 }

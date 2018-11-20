@@ -1,0 +1,12 @@
+Package: CTUtools
+Type: Package
+Title: Common R functions for DKMS CTU
+Version: 0.1.0
+Author: Bose Falk
+Maintainer: Bose Falk <falk@dkms.de>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1

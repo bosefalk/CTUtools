@@ -4,12 +4,16 @@
 \alias{HLA_C_classification}
 \title{Classify HLA-C alleles into C1 & C2 groups}
 \usage{
-HLA_C_classification(allele_c1, allele_c2, fields = 2)
+HLA_C_classification(allele_c1, allele_c2, fields = 2,
+  HLA_C_class = NULL)
 }
 \arguments{
 \item{fields}{Number of fields from allele string reference document to use, should be same as number of fields in \code{allel_c1}.
 For example, if allel_c1 = "02:03", fields should be 2 (the default value). This does not actually apply
 any string manipulation to \code{allele_c1} & \code{c2}, which needs to be done before passing to this function.}
+
+\item{HLA_C_class}{optional, dataframe from \code{\link{HLA_C_class_load}}, if not supplied this will be called within the function
+This option is here to pre-load this reference data, in case where you need to apply this function across a large number of subjects.}
 
 \item{allel_c1}{Allele, as string}
 
@@ -28,6 +32,10 @@ match the input \code{allele_c1} and \code{_c2} - in other words if \code{allele
 }
 \examples{
 HLA_C_classification("01:02", "01:AWFCH")
+
+# For when you need to optimize execution time, pre-load the reference database
+referencedata <- HLA_C_class_load()
+HLA_C_classification("01:02", "01:AWFCH", HLA_C_class = referencedata)
 }
 \seealso{
 \code{\link{HLA_Classification}}, \code{\link{HLA_C_class_data}}

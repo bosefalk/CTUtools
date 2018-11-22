@@ -129,6 +129,8 @@ HLA_Classification = function(allele,HLA_x_class){
 #' @param fields Number of fields from allele string reference document to use, should be same as number of fields in \code{allel_c1}.
 #' For example, if allel_c1 = "02:03", fields should be 2 (the default value). This does not actually apply
 #' any string manipulation to \code{allele_c1} & \code{c2}, which needs to be done before passing to this function.
+#' @param HLA_C_class optional, dataframe from \code{\link{HLA_C_class_load}}, if not supplied this will be called within the function
+#' This option is here to pre-load this reference data, in case where you need to apply this function across a large number of subjects.
 #'
 #' @return One of "C1/C1", "C1/C2", "C2/C2", or \code{NA_character_}, as a string
 #'
@@ -139,10 +141,16 @@ HLA_Classification = function(allele,HLA_x_class){
 #'
 #' @examples
 #' HLA_C_classification("01:02", "01:AWFCH")
-HLA_C_classification = function(allele_c1, allele_c2, fields = 2){
+#'
+#' # For when you need to optimize execution time, pre-load the reference database
+#' referencedata <- HLA_C_class_load()
+#' HLA_C_classification("01:02", "01:AWFCH", HLA_C_class = referencedata)
+HLA_C_classification = function(allele_c1, allele_c2, fields = 2, HLA_C_class = NULL){
 
   # TODO: Add verification input allele string are same length and structure as nchar
-  HLA_C_class <- HLA_C_class_load(fields = fields)
+  if (is.null(HLA_C_class)) {
+    HLA_C_class <- HLA_C_class_load(fields = fields)
+  }
 
   c1 <- HLA_Classification(allele_c1, HLA_C_class)
   c2 <- HLA_Classification(allele_c2, HLA_C_class)

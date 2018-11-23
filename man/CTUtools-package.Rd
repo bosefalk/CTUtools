@@ -23,7 +23,7 @@ Common R functions and reference data used by DKMS CTU.
 
 \code{\link{HLA_C_class_data}}: Reference data for C1 / C2 classification
 
-\code{\link{HLA_C_class_data}}: Reference data for Bw6, Bw4-80I and Bw4-80T classification
+\code{\link{HLA_B_class_data}}: Reference data for Bw6, Bw4-80I and Bw4-80T classification
 
 \code{\link{NMDP}}: Reference data for expanding NMDP codes
 }

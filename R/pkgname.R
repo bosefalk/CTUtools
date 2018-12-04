@@ -10,9 +10,15 @@
 #'
 #' \code{\link{HLA_C_class_data}}: Reference data for C1 / C2 classification
 #'
-#' \code{\link{HLA_C_class_data}}: Reference data for Bw6, Bw4-80I and Bw4-80T classification
+#' \code{\link{HLA_B_class_data}}: Reference data for Bw6, Bw4-80I and Bw4-80T classification
 #'
 #' \code{\link{NMDP}}: Reference data for expanding NMDP codes
+#'
+#' @section Location:
+#'
+#' S:/Donor/Rlib
+#'
+#' \code{packrat::set_opts(local.repos = "S://Donor//Rlib")}
 #'
 #' @keywords internal
 "_PACKAGE"

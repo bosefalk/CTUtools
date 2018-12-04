@@ -28,4 +28,12 @@ Common R functions and reference data used by DKMS CTU.
 \code{\link{NMDP}}: Reference data for expanding NMDP codes
 }
 
+\section{Location}{
+
+
+S:/Donor/Rlib
+
+\code{packrat::set_opts(local.repos = "S://Donor//Rlib")}
+}
+
 \keyword{internal}

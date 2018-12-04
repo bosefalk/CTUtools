@@ -14,6 +14,12 @@
 #'
 #' \code{\link{NMDP}}: Reference data for expanding NMDP codes
 #'
+#' @section Location:
+#'
+#' S:/Donor/Rlib
+#'
+#' \code{packrat::set_opts(local.repos = "S://Donor//Rlib")}
+#'
 #' @keywords internal
 "_PACKAGE"
 #> [1] "_PACKAGE"

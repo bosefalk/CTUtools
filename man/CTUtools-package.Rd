@@ -16,6 +16,8 @@ Common R functions and reference data used by DKMS CTU.
 \code{\link{HLA_C_classification}}: Classify two HLA-C alleles into a C1/C2 group
 
 \code{\link{HLA_B_classification}}: Classify two HLA-B alleles into an overall group Bw6, Bw4-80I or -80T
+
+\code{\link{KIR_det_GCN}}: Convert a KIR string (such as "004+003|006+010") into a Gene Copy Number
 }
 
 \section{Datasets}{

@@ -33,10 +33,13 @@ KIR_det_GCN = function(kir_string, return_numeric = FALSE){
   )
 
   if (return_numeric == TRUE) {
-    if(gcn == "1|2") {gcn <- 1.5}
-    if(gcn == "2|3") {gcn <- 2.5}
-    if(gcn == "3|4") {gcn <- 3.5}
-    gcn <- suppressWarnings(as.numeric(gcn))
+    # When running src/KIR_investigation.Rmd from 18-01 project error is when hitting gcn==1|2 statement no TRUE/FALSE value
+    try({
+      if(is.na(gcn)) {gcn <- NA_integer_}
+      if(gcn == "1|2") {gcn <- 1.5}
+      if(gcn == "2|3") {gcn <- 2.5}
+      if(gcn == "3|4") {gcn <- 3.5}
+      gcn <- suppressWarnings(as.numeric(gcn))}, silent = TRUE)
     return(gcn)
   } else {return(gcn)}
 }

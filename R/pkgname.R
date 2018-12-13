@@ -2,6 +2,8 @@
 #'
 #' \code{\link{shorten_allele}}: Reduce a long allele string (i.e. "01:02:01:03g") down to fewer fields ("01:02")
 #'
+#' \code{\link{KIR_first_field}}: Reduce a long KIR string down to only use the first field (i.e. "001+002|003")
+#'
 #' \code{\link{HLA_C_classification}}: Classify two HLA-C alleles into a C1/C2 group
 #'
 #' \code{\link{HLA_B_classification}}: Classify two HLA-B alleles into an overall group Bw6, Bw4-80I or -80T

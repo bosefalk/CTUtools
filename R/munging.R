@@ -43,7 +43,7 @@ shorten_allele <- function(allele, fields = 2) {
 #' Reduce KIR string to first field
 #'
 #' Reduce a long KIR string (i.e. "0010101/0020102+0020103/0020104|0030105/0030106/0030107") to keep only
-#' the first field, resulting in "001/002+002|003"
+#' the first field, resulting in "001/002+002|003". Keeps all non-numeric entries intact (i.e. "NEG" or "POS")
 #'
 #' @param kir_string KIR string with /, + and | characters
 #'
@@ -52,7 +52,8 @@ shorten_allele <- function(allele, fields = 2) {
 #' @examples
 #' KIR_first_field("0010101/0020102+0020103/0020104|0030105/0030106/0030107")
 #' KIR_first_field("001/002")
-#' KIR_first_field("0010107+0020203|0030507+0120206")
+#' KIR_first_field("0010203+0020304|NEG")
+#' KIR_first_field("POS")
 KIR_first_field <- function(kir_string) {
 
   # Finds two groups, first group is three digits, followed second group which is any number of

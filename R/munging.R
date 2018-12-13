@@ -14,6 +14,13 @@
 #' shorten_allele("01:02:01:03", fields = 3)
 shorten_allele <- function(allele, fields = 2) {
 
+
+  if (!fields %in% c(1,2,3,4)) {
+    stop("shortern_allele: fields can only be set to 1,2,3 or 4")
+  }
+
+
+
   # Remove trailing g if present
   allele <- gsub("G$", "", allele)
 

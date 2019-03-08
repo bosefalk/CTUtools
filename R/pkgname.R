@@ -19,11 +19,13 @@
 #'
 #' \code{\link{NMDP}}: Reference data for expanding NMDP codes
 #'
+#' \code{\link{ASSIGN_KIR3DL1}}: KIR3DL1/HLA-B Subtypes, from Bodreau et al
+#'
 #' @section Location:
 #'
-#' S:/Donor/Rlib
+#' \url{https://github.com/bosefalk/CTUtools}
 #'
-#' \code{packrat::set_opts(local.repos = "S://Donor//Rlib")}
+#' \code{devtools::install_github("bosefalk/CTUtools")}
 #'
 #' @keywords internal
 "_PACKAGE"

@@ -63,6 +63,9 @@ shorten_allele <- function(allele, fields = 2) {
 #' KIR_first_field("POS")
 KIR_first_field <- function(kir_string) {
 
+  if (is.na(kir_string)) {return(NA_character_)}
+  if (kir_string == "") {return(NA_character_)}
+  
   # Finds two groups, first group is three digits, followed second group which is any number of
   # digits, and removes the second group
   st <- gsub("(\\d{3})(\\d*)", "\\1", kir_string)

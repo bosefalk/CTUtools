@@ -184,3 +184,53 @@ KIR3DL1_3DS1_assignment <- function(KIR3DL1_string, KIR3DS1_string) {
   return(kir3dl1.3ds1_overall)
   
 }
+
+#' Classifies KIR3DL1 and HLA-B into strong/weak/no inhibiting
+#' 
+#' 
+#' @param KIRD3L1_assignment String, KIR3DL1 assignment in fromat "KIR3DL1-H", from \code{\link{KIR3DL1_3DS1_assignment}}
+#' @param HLA_B_overall String with HLA-B Bw classification in format "Bw4 - 80T", from \code{\link{HLA_B_classification}}
+#' @param three_levels If set to TRUE, returns separate results for "weak" and "noninhibiting". Default FALSE
+#'
+#' @return String with "Strong inhibiting", "Weak inhibiting/noninhibiting" or "unknown", unless three_levels
+#' is set to TRUE in which case "Weak inhibiting" and "noninhibiting" are split.
+#' 
+#'
+#' @examples
+#' KIR3DL1_HLA_B_inhibiting("KIR3DL1-L", "Bw4 - 80T")
+#' KIR3DL1_HLA_B_inhibiting("KIR3DL1-L", "Bw4 - 80I")
+#' KIR3DL1_HLA_B_inhibiting("KIR3DL1-L", "Bw4 - 80I", three_levels = TRUE)
+#' KIR3DL1_HLA_B_inhibiting("unknown", "Bw4 - 80I")
+KIR3DL1_HLA_B_inhibiting <- function(KIRD3L1_assignment, HLA_B_overall, three_levels = FALSE) {
+  # dplyr::case_when used instead of lots of ifelse statements. If a left hand side evaluates to TRUE, the right hand side
+  # value is returned, otherwise it continues down the list. 
+  
+  
+  if (three_levels == FALSE) {
+  out <- case_when(
+    is.na(KIRD3L1_assignment) | is.na(HLA_B_overall) ~ NA_character_,
+    KIRD3L1_assignment == "unknown" | HLA_B_overall == "unknown" ~ "unknown",
+    KIRD3L1_assignment == "KIR3DL1-L" & HLA_B_overall == "Bw4 - 80T" ~ "Strong inhibiting",
+    KIRD3L1_assignment == "KIR3DL1-H" & HLA_B_overall == "Bw4 - 80I" ~ "Strong inhibiting",
+    TRUE ~ "Weak inhibiting/noninhibiting" # Default value if no other condition is true
+    
+  )
+  }
+  
+  if (three_levels == TRUE) {
+    out <- case_when(
+      is.na(KIRD3L1_assignment) | is.na(HLA_B_overall) ~ NA_character_,
+      KIRD3L1_assignment == "unknown" | HLA_B_overall == "unknown" ~ "unknown",
+      KIRD3L1_assignment == "KIR3DL1-L" & HLA_B_overall == "Bw4 - 80T" ~ "Strong inhibiting",
+      KIRD3L1_assignment == "KIR3DL1-H" & HLA_B_overall == "Bw4 - 80I" ~ "Strong inhibiting",
+      KIRD3L1_assignment == "KIR3DL1-L" & HLA_B_overall == "Bw4 - 80I" ~ "Weak inhibiting",
+      KIRD3L1_assignment == "KIR3DL1-H" & HLA_B_overall == "Bw4 - 80T" ~ "Weak inhibiting",
+      KIRD3L1_assignment == "KIR3DL1-L" & HLA_B_overall == "Bw6" ~ "noninhibiting",
+      KIRD3L1_assignment == "KIR3DL1-H" & HLA_B_overall == "Bw6" ~ "noninhibiting",
+      KIRD3L1_assignment == "KIR3DL1-N" ~ "noninhibiting"
+    )
+
+  }
+  
+  return(out)
+}

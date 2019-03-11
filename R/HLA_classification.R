@@ -175,6 +175,9 @@ HLA_C_classification = function(allele_c1, allele_c2, fields = 2, HLA_C_class = 
 #' @param fields Number of fields from allele string reference document to use, should be same as number of fields in \code{allel_b1}.
 #' For example, if allel_b1 = "44:180", fields should be 2 (the default value). This does not actually apply
 #' any string manipulation to \code{allele_b1} & \code{b2}, which needs to be done before passing to this function.
+#' @param HLA_B_class optional, dataframe from \code{\link{HLA_B_class_load}}, if not supplied this will be called within the function
+#' This option is here to pre-load this reference data, in case where you need to apply this function across a large number of subjects.
+#'
 #'
 #' @return One of "Bw6", "Bw4 - 80T", "Bw4 - 80I", or \code{NA_character_}, as a string
 #'
@@ -182,10 +185,16 @@ HLA_C_classification = function(allele_c1, allele_c2, fields = 2, HLA_C_class = 
 #'
 #' @examples
 #' HLA_B_classification("44:180", "07:02")
-HLA_B_classification = function(allele_b1, allele_b2, fields = 2){
+#' # For when you need to optimize execution time, pre-load the reference database
+#' referencedata <- HLA_B_class_load()
+#' HLA_B_classification("44:180", "07:02", HLA_B_class = referencedata)
+HLA_B_classification = function(allele_b1, allele_b2, fields = 2, HLA_B_class = NULL){
 
-  HLA_B_class <- HLA_B_class_load(fields = fields)
-
+  # TODO: Add verification input allele string are same length and structure as nchar
+  if (is.null(HLA_B_class)) {
+    HLA_B_class <- HLA_B_class_load(fields = fields)
+  }
+  
   b1 = HLA_Classification(allele_b1,HLA_B_class)
   b2 = HLA_Classification(allele_b2,HLA_B_class)
 

@@ -17,4 +17,7 @@ ASSIGN_KIR3DL1
 \description{
 KIR3DL1/HLA-B Subtypes Govern Acute Myelogenous Leukemia Relapse After Hematopoietic Cell Transplantation, Boudreau et al.
 }
+\seealso{
+\code{\link{KIR3DL1_3DS1_assignment}}
+}
 \keyword{datasets}

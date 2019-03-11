@@ -52,6 +52,6 @@
 #'   \item{Allele}{KIR3DL1 allele}
 #'   \item{Class}{Allele classification. 0 means unclassified}
 #' }
-#'
+#' @seealso \code{\link{KIR3DL1_3DS1_assignment}}
 #' @source Boudreau et al. Journal of Clinical Oncology 2017 35:20, 2268-2278
 "ASSIGN_KIR3DL1"

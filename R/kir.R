@@ -190,47 +190,48 @@ KIR3DL1_3DS1_assignment <- function(KIR3DL1_string, KIR3DS1_string) {
 #' 
 #' @param KIRD3L1_assignment String, KIR3DL1 assignment in fromat "KIR3DL1-H", from \code{\link{KIR3DL1_3DS1_assignment}}
 #' @param HLA_B_overall String with HLA-B Bw classification in format "Bw4 - 80T", from \code{\link{HLA_B_classification}}
-#' @param three_levels If set to TRUE, returns separate results for "weak" and "noninhibiting". Default FALSE
+#' @param levels Can be set to 2, 3 or 4, default is 2
 #'
-#' @return String with "Strong inhibiting", "Weak inhibiting/noninhibiting" or "unknown", unless three_levels
-#' is set to TRUE in which case "Weak inhibiting" and "noninhibiting" are split.
+#' @return If levels = 2, string with "Strong inhibiting", "Weak inhibiting/noninhibiting" or "unknown". If levels = 3, 
+#' split into "Weak inhibiting" and "non-inhibiting". If levels = 4, split "noninhibiting" into "Missing ligand" and "Educated, uninhibiting"
 #' 
 #'
 #' @examples
 #' KIR3DL1_HLA_B_inhibiting("KIR3DL1-L", "Bw4 - 80T")
-#' KIR3DL1_HLA_B_inhibiting("KIR3DL1-L", "Bw4 - 80I")
-#' KIR3DL1_HLA_B_inhibiting("KIR3DL1-L", "Bw4 - 80I", three_levels = TRUE)
+#' KIR3DL1_HLA_B_inhibiting("KIR3DL1-N", "Bw4 - 80I")
+#' KIR3DL1_HLA_B_inhibiting("KIR3DL1-N", "Bw4 - 80I", levels = 3)
+#' KIR3DL1_HLA_B_inhibiting("KIR3DL1-N", "Bw4 - 80I", levels = 4)
+#' KIR3DL1_HLA_B_inhibiting("unknown", NA)
 #' KIR3DL1_HLA_B_inhibiting("unknown", "Bw4 - 80I")
-KIR3DL1_HLA_B_inhibiting <- function(KIRD3L1_assignment, HLA_B_overall, three_levels = FALSE) {
+KIR3DL1_HLA_B_inhibiting <- function(KIR3DL1_assignment, HLA_B_overall, levels = 2) {
   # dplyr::case_when used instead of lots of ifelse statements. If a left hand side evaluates to TRUE, the right hand side
   # value is returned, otherwise it continues down the list. 
   
-  
-  if (three_levels == FALSE) {
-  out <- case_when(
-    is.na(KIRD3L1_assignment) | is.na(HLA_B_overall) ~ NA_character_,
-    KIRD3L1_assignment == "unknown" | HLA_B_overall == "unknown" ~ "unknown",
-    KIRD3L1_assignment == "KIR3DL1-L" & HLA_B_overall == "Bw4 - 80T" ~ "Strong inhibiting",
-    KIRD3L1_assignment == "KIR3DL1-H" & HLA_B_overall == "Bw4 - 80I" ~ "Strong inhibiting",
-    TRUE ~ "Weak inhibiting/noninhibiting" # Default value if no other condition is true
-    
-  )
-  }
-  
-  if (three_levels == TRUE) {
+  # First constructs the most detailed case, when levels = 4. Then, if levels is set lower it merges groups together.
     out <- case_when(
-      is.na(KIRD3L1_assignment) | is.na(HLA_B_overall) ~ NA_character_,
-      KIRD3L1_assignment == "unknown" | HLA_B_overall == "unknown" ~ "unknown",
-      KIRD3L1_assignment == "KIR3DL1-L" & HLA_B_overall == "Bw4 - 80T" ~ "Strong inhibiting",
-      KIRD3L1_assignment == "KIR3DL1-H" & HLA_B_overall == "Bw4 - 80I" ~ "Strong inhibiting",
-      KIRD3L1_assignment == "KIR3DL1-L" & HLA_B_overall == "Bw4 - 80I" ~ "Weak inhibiting",
-      KIRD3L1_assignment == "KIR3DL1-H" & HLA_B_overall == "Bw4 - 80T" ~ "Weak inhibiting",
-      KIRD3L1_assignment == "KIR3DL1-L" & HLA_B_overall == "Bw6" ~ "noninhibiting",
-      KIRD3L1_assignment == "KIR3DL1-H" & HLA_B_overall == "Bw6" ~ "noninhibiting",
-      KIRD3L1_assignment == "KIR3DL1-N" ~ "noninhibiting"
+      is.na(KIR3DL1_assignment) | is.na(HLA_B_overall) ~ NA_character_,
+      KIR3DL1_assignment == "unknown" | HLA_B_overall == "unknown" ~ "unknown",
+      KIR3DL1_assignment == "KIR3DL1-L" & HLA_B_overall == "Bw4 - 80T" ~ "Strong inhibiting",
+      KIR3DL1_assignment == "KIR3DL1-H" & HLA_B_overall == "Bw4 - 80I" ~ "Strong inhibiting",
+      KIR3DL1_assignment == "KIR3DL1-L" & HLA_B_overall == "Bw4 - 80I" ~ "Weak inhibiting",
+      KIR3DL1_assignment == "KIR3DL1-H" & HLA_B_overall == "Bw4 - 80T" ~ "Weak inhibiting",
+      KIR3DL1_assignment == "KIR3DL1-L" & HLA_B_overall == "Bw6" ~ "Missing ligand",
+      KIR3DL1_assignment == "KIR3DL1-H" & HLA_B_overall == "Bw6" ~ "Missing ligand",
+      KIR3DL1_assignment == "KIR3DL1-N" & HLA_B_overall == "Bw6" ~ "Missing ligand",
+      KIR3DL1_assignment == "KIR3DL1-N" & HLA_B_overall == "Bw4 - 80I" ~ "Educated, Uninhibited",
+      KIR3DL1_assignment == "KIR3DL1-N" & HLA_B_overall == "Bw4 - 80T" ~ "Educated, Uninhibited"
     )
 
-  }
-  
-  return(out)
+    if (levels == 4) {return(out)}
+    
+    # group Missing Ligand and Educated, Uninhibited into "noninhibiting"
+      out <- ifelse((out == "Missing ligand" | out == "Educated, Uninhibited"),
+             "noninhibiting", out)
+    
+    if (levels == 3) {return(out)}
+    
+    # For levels = 2, also group weak and noninhibiting together
+      out <- ifelse((out == "noninhibiting" | out == "Weak inhibiting"),
+                    "Weak inhibiting/noninhibiting", out)
+    return(out) # Returns here if levels = 2
 }

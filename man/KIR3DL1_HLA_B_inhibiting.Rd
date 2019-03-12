@@ -4,26 +4,27 @@
 \alias{KIR3DL1_HLA_B_inhibiting}
 \title{Classifies KIR3DL1 and HLA-B into strong/weak/no inhibiting}
 \usage{
-KIR3DL1_HLA_B_inhibiting(KIRD3L1_assignment, HLA_B_overall,
-  three_levels = FALSE)
+KIR3DL1_HLA_B_inhibiting(KIR3DL1_assignment, HLA_B_overall, levels = 2)
 }
 \arguments{
-\item{KIRD3L1_assignment}{String, KIR3DL1 assignment in fromat "KIR3DL1-H", from \code{\link{KIR3DL1_3DS1_assignment}}}
-
 \item{HLA_B_overall}{String with HLA-B Bw classification in format "Bw4 - 80T", from \code{\link{HLA_B_classification}}}
 
-\item{three_levels}{If set to TRUE, returns separate results for "weak" and "noninhibiting". Default FALSE}
+\item{levels}{Can be set to 2, 3 or 4, default is 2}
+
+\item{KIRD3L1_assignment}{String, KIR3DL1 assignment in fromat "KIR3DL1-H", from \code{\link{KIR3DL1_3DS1_assignment}}}
 }
 \value{
-String with "Strong inhibiting", "Weak inhibiting/noninhibiting" or "unknown", unless three_levels
-is set to TRUE in which case "Weak inhibiting" and "noninhibiting" are split.
+If levels = 2, string with "Strong inhibiting", "Weak inhibiting/noninhibiting" or "unknown". If levels = 3, 
+split into "Weak inhibiting" and "non-inhibiting". If levels = 4, split "noninhibiting" into "Missing ligand" and "Educated, uninhibiting"
 }
 \description{
 Classifies KIR3DL1 and HLA-B into strong/weak/no inhibiting
 }
 \examples{
 KIR3DL1_HLA_B_inhibiting("KIR3DL1-L", "Bw4 - 80T")
-KIR3DL1_HLA_B_inhibiting("KIR3DL1-L", "Bw4 - 80I")
-KIR3DL1_HLA_B_inhibiting("KIR3DL1-L", "Bw4 - 80I", three_levels = TRUE)
+KIR3DL1_HLA_B_inhibiting("KIR3DL1-N", "Bw4 - 80I")
+KIR3DL1_HLA_B_inhibiting("KIR3DL1-N", "Bw4 - 80I", levels = 3)
+KIR3DL1_HLA_B_inhibiting("KIR3DL1-N", "Bw4 - 80I", levels = 4)
+KIR3DL1_HLA_B_inhibiting("unknown", NA)
 KIR3DL1_HLA_B_inhibiting("unknown", "Bw4 - 80I")
 }

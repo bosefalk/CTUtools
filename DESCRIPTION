@@ -1,7 +1,7 @@
 Package: CTUtools
 Type: Package
 Title: Common R functions for DKMS CTU
-Version: 0.1.4
+Version: 0.1.5
 Author: Bose Falk
 Maintainer: Bose Falk <falk@dkms.de>
 Description: Common R functions and reference data used by DKMS CTU.

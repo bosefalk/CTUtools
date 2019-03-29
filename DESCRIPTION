@@ -5,7 +5,7 @@ Version: 0.1.5
 Author: Bose Falk
 Maintainer: Bose Falk <falk@dkms.de>
 Description: Common R functions and reference data used by DKMS CTU.
-License: What license is it under?
+License: file LICENSE
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 6.1.1

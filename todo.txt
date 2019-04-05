@@ -12,6 +12,3 @@ HLA_C and HLA_B_classification functions: Add input validation that allele strin
 shorten_allele fields > 2 check if it works on NMDP fields
 
 HLA_A classification any A11 or A3
-
-Test line to check git commit from remote server
-Another test line to check from laptop to remote server

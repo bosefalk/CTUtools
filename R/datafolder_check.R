@@ -1,10 +1,28 @@
-# For git, we don't want to sync the actual data to gitlab. Instead, the data folder should be manually copied wherever it's safe,
-# and there should be a list in doc/data_folder_content.csv with a list of the files expected in data/, and their md5 checksums. 
-# This .csv is synced to git, so we can check against it at the start of every analysis script that the actual files in the data 
-# folder on this machine matches what the rest of the code expected to be there.
-library(openssl)
-library(dplyr)
-
+#' Check local data folder is up-to-date
+#' 
+#' We don't want to sync the actual data to git remotes. Instead, the data folder should be manually copied wherever it's safe,
+#' and there should be a list in doc/data_folder_content.csv with a list of the files expected in data/, and their md5 checksums. 
+#' This .csv is synced to git, so we can check against it at the start of every analysis script that the actual files in the data 
+#' folder on this machine matches what the rest of the code expects to be there. This is what this function does - compares 
+#' doc/data_folder_content.csv to the actual contents in data/, and outputs an error or warning if things are not matching, with a list
+#' of mismatches.
+#' 
+#' The intention is to add this datafolder_check() call at the top of every analysis script to automatically catch data mismatches
+#'
+#' @param stop_on_error if TRUE, stops execution with an error message when a file is listed in data_folder_content.csv but doesn't match 
+#' the contents of data/. If set to FALSE, instead outputs a warning and continues execution of the code.
+#'
+#' @details The md5 checksum is created using \code{openssl::md5(file(<filename>))}
+#' 
+#' Generating doc/data_folder_content.csv is done using \code{\link{datafolder_update}}
+#' 
+#' \code{tests/testthat/test_data_folder_content.R} has a large number of tests for different combinations of updates and examples of the messages
+#' 
+#' @return If no mismatches has been found, returns nothing. If a mismatch is found an error or warning is raised, with a message listing
+#'  the files which are missing, changed, renamed, or are new in the data folder and not yet recorded. If the number of files to list is >15
+#'  a temp file is opened with this information instead of printing it to console 
+#'  
+#' @seealso \code{\link{datafolder_update}}
 datafolder_check <- function(stop_on_error = TRUE) {
   
   # Check workspace is as expected
@@ -80,10 +98,13 @@ datafolder_check <- function(stop_on_error = TRUE) {
     return(error_string)
   }
   
+  # If the number of discrepancies is too large (>=15) instead of cluttering the console the details are written to a temp file which 
+  # is displayed
   if (nrow(data_new_files) + nrow(changes) > 15) {
     error_file <- tempfile()
   }
   
+  # New files appearing in the data folder
   if (nrow(data_new_files) > 0) {
     dnf_string <- "New files appeared in data folder, run CTUtools::datafolder_update()\n"
     dnf_string <- paste0(dnf_string, paste0(capture.output(data_new_files), collapse = "\n"), "\n")
@@ -93,7 +114,7 @@ datafolder_check <- function(stop_on_error = TRUE) {
       cat(dnf_string)
       sink()
       
-      if (nrow(changes) == 0) { # if there are only added files the error block which displays the file won't trigger
+      if (nrow(changes) == 0) { # if there are only added files the error block which displays the file below won't trigger
         file.show(error_file, title = "datafiles_check() messages")
       }
       
@@ -104,8 +125,6 @@ datafolder_check <- function(stop_on_error = TRUE) {
   
   # If there are discepancies between the csv and actual data file, send a message with the details and either throw an error or 
   # a warning depending on the stop_on_error flag
-  # If the number of discrepancies is too large (>=15) instead of cluttering the console the details are written to a temp file which 
-  # is displayed
   if (nrow(changes) > 0) {
 
     error_string <- error_msg()
@@ -131,7 +150,16 @@ datafolder_check <- function(stop_on_error = TRUE) {
   return() # Everything matches
 }
 
-
+#' Save data folder content list to sync to git
+#' 
+#' Creates the doc/data_folder_content.csv file which is synced to git, and used by \code\link{datafolder_check} to make sure the 
+#' local data folder is up-to-date with the rest of the code 
+#'
+#' @details The md5 checksum is created using \code{openssl::md5(file(<filename>))}
+#' 
+#' @return Nothing, writes doc/data_folder_content.csv directly
+#' 
+#' @seealso \code{\link{datafolder_check}}
 datafolder_update <- function() {
   
   # Check workspace is as expected

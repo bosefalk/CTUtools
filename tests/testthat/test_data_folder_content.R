@@ -13,6 +13,7 @@ baseloc <- tempfile()
 dir.create(baseloc)
 setwd(baseloc)
 dir.create("data")
+dir.create("data/subdir")
 dir.create("doc")
 
 # Create three data files in the data subdirectory
@@ -31,7 +32,7 @@ write.table(
 write.csv(
   data.frame(colDate = c(as.Date("2018-01-02"), as.Date("2019-02-02")), 
              colFactor = as.factor(c("factorA", "factorB"))),
-  file = "data/fileC.csv",
+  file = "data/subdir/fileC.csv",
   row.names = FALSE
 )
 
@@ -99,7 +100,7 @@ test_that("Correctly identify missing, changed and renamed files in updated doc/
   # Renamed files, rename fileC.csv to fileX.csv in data_folder_content
   copy_baseloc()
   data_folder_content <- read.csv("doc/data_folder_content.csv", stringsAsFactors = FALSE)
-  data_folder_content$path[3] <- "fileX.csv"
+  data_folder_content$path[3] <- "subdir/fileX.csv"
   write.csv(
     data_folder_content,
     file = "doc/data_folder_content.csv", 
@@ -111,8 +112,7 @@ test_that("Correctly identify missing, changed and renamed files in updated doc/
   expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileX.csv")
   expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileC.csv")
   
-
-
+  
   # One missing file, one changed file and one renamed file:
   copy_baseloc()
   
@@ -126,7 +126,7 @@ test_that("Correctly identify missing, changed and renamed files in updated doc/
   data_folder_content <- read.csv("doc/data_folder_content.csv", stringsAsFactors = FALSE)
   data_folder_content$md5[data_folder_content$path == "fileA.csv"] <- fileA_newmd5
   
-  data_folder_content$path[3] <- "fileX.csv"
+  data_folder_content$path[3] <- "subdir/fileX.csv"
   
   write.csv(
     data_folder_content,
@@ -146,8 +146,213 @@ test_that("Correctly identify missing, changed and renamed files in updated doc/
   
 
   
+  
+  
 })
 
+
+test_that("data files updated but not reflected in data_folder_content.csv", {
+  
+  # New file added to data but not reflected in data_folder_content.csv
+  copy_baseloc()
+  write.csv(
+    data.frame(colT = c("T", "U"), 
+               colU = c(3, 7)),
+    file = "data/fileD.csv",
+    row.names = FALSE
+  )
+  expect_message(datafolder_check(), "New files appeared in data folder")
+  expect_message(datafolder_check(), "fileD.csv")
+  
+  
+  # Changing a file should give the same error as if a new data_folder_content.csv was downloaded and had an updated md5
+  copy_baseloc()
+  fileA <- read.csv("data/fileA.csv", stringsAsFactors = FALSE)
+  fileA$colB[1] <- 15
+  write.csv(fileA, "data/fileA.csv", row.names = FALSE)
+  expect_error(datafolder_check(), "data folder file list doesn't match doc/data_folder_content.csv")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "Missing or outdated files in data:")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "Changed files:")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileA.csv")
+  
+  
+  # Same with renaming a file
+  copy_baseloc()
+  file.rename("data/subdir/fileC.csv", "data/subdir/fileX.csv")
+  expect_error(datafolder_check(), "data folder file list doesn't match doc/data_folder_content.csv")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "Missing or outdated files in data:")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "Renamed files:")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileX.csv")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileC.csv")
+  
+  # One new file in data, one renamed and one changed:
+  copy_baseloc()
+  write.csv(
+    data.frame(colT = c("T", "U"), 
+               colU = c(3, 7)),
+    file = "data/fileD.csv",
+    row.names = FALSE
+  )
+  fileA <- read.csv("data/fileA.csv", stringsAsFactors = FALSE)
+  fileA$colB[1] <- 15
+  write.csv(fileA, "data/fileA.csv", row.names = FALSE)
+  file.rename("data/subdir/fileC.csv", "data/subdir/fileX.csv")
+  expect_error(datafolder_check(), "data folder file list doesn't match doc/data_folder_content.csv")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "Missing or outdated files in data:")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "Changed files:")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileA.csv")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "Renamed files:")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileX.csv")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileC.csv")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "New files appeared in data folder")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileD.csv")
+  
+
+})
+
+test_that("If there are too many different files, open a tempfile with list instead of printing to console", {
+  
+  # 20 new files listed in .csv
+  copy_baseloc()
+  new_dfc <- data.frame(path = replicate(20, tempfile(tmpdir = "", fileext = ".csv")), 
+                        md5 = replicate(20, as.character(openssl::md5(tempfile()))), 
+                        stringsAsFactors = FALSE)
+  new_dfc$path <- gsub("/", "", new_dfc$path)
+  data_folder_content <- read.csv("doc/data_folder_content.csv", stringsAsFactors = FALSE)
+  data_folder_content <- rbind(data_folder_content, new_dfc)
+  write.csv(
+    data_folder_content,
+    file = "doc/data_folder_content.csv", 
+    row.names = FALSE
+  )
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), NA) # Expect no messages as it should have opened a new window
+  expect_error(datafolder_check(), "data folder file list doesn't match doc/data_folder_content.csv")
+
+  # 20 new files added to data subfolder but not listed in csv
+  copy_baseloc()
+  rnd_strings <- replicate(20, paste0(sample(LETTERS, 50, replace = TRUE), collapse = ""))
+  for (l in rnd_strings) {
+    writeLines(l, tempfile(tmpdir = "data", fileext = ".csv"))
+  }
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), NA)
+  
+  # 10 files added to data folder and 10 new entries added to .csv
+  copy_baseloc()
+  new_dfc <- data.frame(path = replicate(10, tempfile(tmpdir = "", fileext = ".csv")), 
+                        md5 = replicate(10, as.character(openssl::md5(tempfile()))), 
+                        stringsAsFactors = FALSE)
+  new_dfc$path <- gsub("/", "", new_dfc$path)
+  data_folder_content <- read.csv("doc/data_folder_content.csv", stringsAsFactors = FALSE)
+  data_folder_content <- rbind(data_folder_content, new_dfc)
+  write.csv(
+    data_folder_content,
+    file = "doc/data_folder_content.csv", 
+    row.names = FALSE
+  )
+  rnd_strings <- replicate(10, paste0(sample(LETTERS, 50, replace = TRUE), collapse = ""))
+  for (l in rnd_strings) {
+    writeLines(l, tempfile(tmpdir = "data", fileext = ".csv"))
+  }
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), NA)
+  expect_error(datafolder_check(), "data folder file list doesn't match doc/data_folder_content.csv")
+})
+
+
+test_that("datafolder_update correctly writes a csv", {
+  copy_baseloc()
+  file.remove("doc/data_folder_content.csv")
+  datafolder_update()
+  expect_silent(datafolder_check())
+  
+  copy_baseloc()
+  file.remove("doc/data_folder_content.csv")
+  file.remove("data/fileB.txt")
+  datafolder_update()
+  expect_silent(datafolder_check())
+  
+  
+})
+
+
+test_that("datafolder_check() handles missing expected inputs", {
+  
+  # No doc/data_folder_content.csv
+  copy_baseloc()
+  file.remove("doc/data_folder_content.csv")
+  expect_warning(datafolder_check(), "doc/data_folder_content.csv does not exist ")
+  
+  # No doc folder at all
+  copy_baseloc()
+  unlink("doc", recursive = TRUE)
+  expect_error(datafolder_check(), "Missing data and / or doc folder")
+  
+  # No data folder
+  copy_baseloc()
+  unlink("data", recursive = TRUE)
+  expect_error(datafolder_check(), "Missing data and / or doc folder")
+  
+  # Empty data folder
+  copy_baseloc()
+  unlink("data", recursive = TRUE)
+  dir.create("data")
+  expect_warning(datafolder_check(), "data folder is empty, exiting datafiles_check()")
+  
+  # Empty data files, should work fine just list all files as changed due to the md5 being the same
+  copy_baseloc()
+  file.remove("data/fileA.csv")
+  file.remove("data/fileB.txt")
+  file.remove("data/subdir/fileC.csv")
+  file.create("data/fileA.csv")
+  file.create("data/fileB.txt")
+  file.create("data/subdir/fileC.csv")
+  expect_error(datafolder_check(), "data folder file list doesn't match doc/data_folder_content.csv")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "Changed files:")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileA.csv")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileB.txt")
+  expect_message(suppressWarnings(datafolder_check(stop_on_error = FALSE)), "fileC.csv")
+    
+  # Missing columns and malformed data in data_folder_content.csv
+  copy_baseloc()
+  good_dfc <- read.csv("doc/data_folder_content.csv", stringsAsFactors = FALSE)
+  
+  data_folder_content <- good_dfc
+  data_folder_content$md5 <- c(1, 23, 52)
+  write.csv(
+    data_folder_content,
+    file = "doc/data_folder_content.csv", 
+    row.names = FALSE
+  )
+  expect_error(datafolder_check(), "path or md5 column in doc/data_folder_content.csv not read as character strings")
+  
+  data_folder_content <- good_dfc
+  data_folder_content$path <- NA_character_
+  write.csv(
+    data_folder_content,
+    file = "doc/data_folder_content.csv", 
+    row.names = FALSE
+  )
+  expect_error(datafolder_check(), "path or md5 column in doc/data_folder_content.csv not read as character strings")
+  
+  data_folder_content <- good_dfc
+  data_folder_content$path <- NULL
+  write.csv(
+    data_folder_content,
+    file = "doc/data_folder_content.csv", 
+    row.names = FALSE
+  )
+  expect_error(datafolder_check(), "path or md5 column missing from doc/data_folder_content.csv")
+  
+  data_folder_content <- good_dfc
+  data_folder_content$md5 <- NULL
+  write.csv(
+    data_folder_content,
+    file = "doc/data_folder_content.csv", 
+    row.names = FALSE
+  )
+  expect_error(datafolder_check(), "path or md5 column missing from doc/data_folder_content.csv")
+
+  
+})
 
 # Return from test environment --------------------------------------------
 

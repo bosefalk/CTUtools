@@ -9,7 +9,7 @@
   \item{Allele}{Component alleles, separated by "/"}
 }}
 \source{
-\url{https://hml.nmdp.org/MacUI/}
+\url{https://bioinformatics.bethematchclinical.org/hla-resources/allele-codes/allele-code-lists/allele-code-list-in-alphabetical-order/}
 }
 \usage{
 NMDP

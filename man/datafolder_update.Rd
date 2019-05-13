@@ -10,7 +10,7 @@ datafolder_update()
 Nothing, writes doc/data_folder_content.csv directly
 }
 \description{
-Creates the doc/data_folder_content.csv file which is synced to git, and used by \code\link{datafolder_check} to make sure the 
+Creates the doc/data_folder_content.csv file which is synced to git, and used by \code{\link{datafolder_check}} to make sure the 
 local data folder is up-to-date with the rest of the code
 }
 \details{

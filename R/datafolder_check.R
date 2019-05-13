@@ -152,7 +152,7 @@ datafolder_check <- function(stop_on_error = TRUE) {
 
 #' Save data folder content list to sync to git
 #' 
-#' Creates the doc/data_folder_content.csv file which is synced to git, and used by \code\link{datafolder_check} to make sure the 
+#' Creates the doc/data_folder_content.csv file which is synced to git, and used by \code{\link{datafolder_check}} to make sure the 
 #' local data folder is up-to-date with the rest of the code 
 #'
 #' @details The md5 checksum is created using \code{openssl::md5(file(<filename>))}

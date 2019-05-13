@@ -40,7 +40,7 @@
 #'   \item{Allele}{Component alleles, separated by "/"}
 #' }
 #'
-#' @source \url{https://hml.nmdp.org/MacUI/}
+#' @source \url{https://bioinformatics.bethematchclinical.org/hla-resources/allele-codes/allele-code-lists/allele-code-list-in-alphabetical-order/}
 "NMDP"
 
 #' KIR3DL1/HLA-B Subtypes

@@ -104,6 +104,7 @@ HLA_Classification = function(allele,HLA_x_class){
     xx = unlist(strsplit(xx, split = ":", fixed = T))
     nmdp_allele = NMDP$Allele[NMDP$nmdp_codes==xx[2]] # TODO: currently only looks at second field
     nmdp_allele = unlist(strsplit(nmdp_allele, split = "/", fixed = T))
+    nmdp_allele = gsub("^\\d*:", "", nmdp_allele)
     nmdp_allele = sapply(nmdp_allele, function(x){paste(xx[1],x,sep=":")})
     xclass_split = sapply(nmdp_allele, function(x){
       y = HLA_x_class$Class[HLA_x_class$Allele==x]

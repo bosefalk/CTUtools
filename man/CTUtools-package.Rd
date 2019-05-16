@@ -15,6 +15,8 @@ Common R functions and reference data used by DKMS CTU.
 
 \code{\link{KIR_first_field}}: Reduce a long KIR string down to only use the first field (i.e. "001+002|003")
 
+\code{\link{KIR_present}}: Determine if a KIR is present or absent given a KIR string
+
 \code{\link{HLA_C_classification}}: Classify two HLA-C alleles into a C1/C2 group
 
 \code{\link{HLA_B_classification}}: Classify two HLA-B alleles into an overall group Bw6, Bw4-80I or -80T

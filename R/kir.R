@@ -235,3 +235,30 @@ KIR3DL1_HLA_B_inhibiting <- function(KIR3DL1_assignment, HLA_B_overall, levels =
                     "Weak inhibiting/noninhibiting", out)
     return(out) # Returns here if levels = 2
 }
+
+
+
+#' KIR present/absent
+#'
+#' Determine whether the KIR is present, given a KIR string. Assumes an empty string, or a string with only "NEG" means the KIR is 
+#' absent, any other results means it's present - make sure the data follows this assumption before passing to this function.
+#'
+#' @param string KIR string
+#'
+#' @return TRUE if the KIR is present, FALSE if it's not present, NA if passed an empty/NA string
+#'
+#' @examples
+#' KIR_present("003/034+003/034") # TRUE = present
+#' KIR_present("NEG") # FALSE = absent
+#' KIR_present("") # = NA
+KIR_present <- function(string) {
+  # Assumes anything other than an empty string or a "NEG" KIR string means the gene is present
+  # Need to make sure inputs are cleaned
+  out <- case_when(
+    is.na(string) ~ NA,
+    grepl("^$", string) ~ NA,
+    string == "NA" ~ NA,
+    string == "NEG" ~ FALSE,
+    TRUE ~ TRUE)
+  return(out)
+}

@@ -39,7 +39,7 @@ datafolder_check <- function(stop_on_error = TRUE) {
   }
   
   # Check data_folder_content.csv is as expected
-  data_folder_content <- read.csv("doc/data_folder_content.csv", stringsAsFactors = FALSE)
+  data_folder_content <- read.csv("doc/data_folder_content.csv", stringsAsFactors = FALSE, fileEncoding = "UTF-8")
   
   if(!"path" %in% colnames(data_folder_content) | !"md5" %in% colnames(data_folder_content)) {
     stop("path or md5 column missing from doc/data_folder_content.csv")
@@ -178,5 +178,5 @@ datafolder_update <- function() {
     datafiles$md5[i] <- as.character(openssl::md5(file(paste0("data/", datafiles$path[i]))))
     
   }
-  write.csv(datafiles, file = "doc/data_folder_content.csv", row.names = FALSE)
+  write.csv(datafiles, file = "doc/data_folder_content.csv", row.names = FALSE, fileEncoding = "UTF-8")
 }

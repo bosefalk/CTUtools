@@ -16,7 +16,6 @@
 #' 
 #' \code{\link{KIR3DL1_3DS1_assignment}}: Classifies KIR 3DL1 & 3DS1 alleles into KIR3DL1-H, -L, -N
 #' 
-#' \code{\link{datafolder_check}}: Checks the files in data subfolder (which is not on git) matches doc/data_folder_content.csv (which is synced)
 #'
 #'
 #' @section Datasets:

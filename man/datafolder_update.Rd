@@ -6,16 +6,6 @@
 \usage{
 datafolder_update()
 }
-\value{
-Nothing, writes doc/data_folder_content.csv directly
-}
 \description{
-Creates the doc/data_folder_content.csv file which is synced to git, and used by \code{\link{datafolder_check}} to make sure the 
-local data folder is up-to-date with the rest of the code
-}
-\details{
-The md5 checksum is created using \code{openssl::md5(file(<filename>))}
-}
-\seealso{
-\code{\link{datafolder_check}}
+These functions have been moved to a separate package, see \link{https://github.com/bosefalk/datafolder}
 }

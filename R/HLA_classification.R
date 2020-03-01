@@ -123,29 +123,34 @@ HLA_Classification = function(allele,HLA_x_class){
 #' Classify HLA-C alleles into C1 & C2 groups
 #'
 #' Takes two HLA-C alleles, classifies them individually into C1 or C2 using \code{\link{HLA_Classification}} and \code{\link{HLA_C_class_data}},
-#' and returns the joint C1/C1, C1/C2 or C2/C2 class. If either allel classification is unknown, returns NA.
+#' and returns the joint C1/C1, C1/C2 or C2/C2 class. If either allel classification is unknown or missing, returns NA.
 #'
-#' @param allel_c1 Allele, as string
-#' @param allel_c2 Allele, as string
+#' @param allel_c1 Allele column, as string
+#' @param allel_c2 Allele column, as string
 #' @param fields Number of fields from allele string reference document to use, should be same as number of fields in \code{allel_c1}.
 #' For example, if allel_c1 = "02:03", fields should be 2 (the default value). This does not actually apply
-#' any string manipulation to \code{allele_c1} & \code{c2}, which needs to be done before passing to this function.
+#' any string manipulation to \code{allele_c1} & \code{allele_c2}, which needs to be done before passing to this function, 
+#' using \code{\link{shorten_allel}}
 #' @param HLA_C_class optional, dataframe from \code{\link{HLA_C_class_load}}, if not supplied this will be called within the function
 #' This option is here to pre-load this reference data, in case where you need to apply this function across a large number of subjects.
 #'
-#' @return One of "C1/C1", "C1/C2", "C2/C2", or \code{NA_character_}, as a string
+#' @return String vector with "C1/C1", "C1/C2", "C2/C2", or \code{NA_character_}
 #'
 #' @details There are only three outcome classes, C1/C1, C1/C2 and C2/C2. The location of each C-class before or after the "/" does not
 #' match the input \code{allele_c1} and \code{_c2} - in other words if \code{allele_c1 = "C2"} and \code{allele_c2 = "C1"} the result is still C1/C2
+#' The input alleles should be shortened to match the number of fields in the reference data.
 #'
 #' @seealso \code{\link{HLA_Classification}}, \code{\link{HLA_C_class_data}}
 #'
 #' @examples
 #' HLA_C_classification("01:02", "01:AWFCH")
-#'
-#' # For when you need to optimize execution time, pre-load the reference database
-#' referencedata <- HLA_C_class_load()
-#' HLA_C_classification("01:02", "01:AWFCH", HLA_C_class = referencedata)
+#' 
+#' dat <- data.frame(C1 = c("01:02", "02:03", "04:10"), C2 = c("01:AWFCH", "07:59", "05:50"), stringsAsFactors = FALSE)
+#' HLA_C_classification(dat$C1, dat$C2)
+#' 
+#' # If either allele cannot be mapped to the reference data, NA is returned
+#' dat_odd <- data.frame(C1 = c("01:02", "01:02", "01:02"), C2 = c(NA, "", "07:02:01"), stringsAsFactors = FALSE)
+#' HLA_C_classification(dat_odd$C1, dat_odd$C2)
 HLA_C_classification = function(allele_c1, allele_c2, fields = 2, HLA_C_class = NULL){
 
   # TODO: Add verification input allele string are same length and structure as nchar
@@ -153,15 +158,21 @@ HLA_C_classification = function(allele_c1, allele_c2, fields = 2, HLA_C_class = 
     HLA_C_class <- HLA_C_class_load(fields = fields)
   }
 
-  c1 <- HLA_Classification(allele_c1, HLA_C_class)
-  c2 <- HLA_Classification(allele_c2, HLA_C_class)
-
+  
+  c1 <- unlist(lapply(allele_c1, HLA_Classification, HLA_C_class))
+  c2 <- unlist(lapply(allele_c2, HLA_Classification, HLA_C_class))
+  tmp_df <- data.frame(c1_class = c1, c2_class = c2, stringsAsFactors = FALSE)
   # Logic for determining joint group, if either allele was not possible to classify returns NA
-  if (any(is.na(c(c1, c2)))) return(NA_character_)
-  if (c1 == "C2" & c2 == "C2") return("C2/C2")
-  if ((c1 == "C2" & c2 == "C1") | (c1 == "C1" & c2 == "C2")) return("C1/C2")
-  if (c1 == "C1" & c2 == "C1") return("C1/C1")
-  else {return(NA_character_)}
+  out <- dplyr::case_when(
+    is.na(tmp_df$c1_class) | is.na(tmp_df$c2_class) ~ NA_character_,
+    tmp_df$c1_class == "C2" & tmp_df$c2_class == "C2" ~ "C2/C2",
+    tmp_df$c1_class == "C2" & tmp_df$c2_class == "C1" |
+      tmp_df$c1_class == "C1" & tmp_df$c2_class == "C2" ~ "C1/C2",
+    tmp_df$c1_class == "C1" & tmp_df$c2_class == "C1" ~ "C1/C1",
+    TRUE ~ NA_character_
+  )
+
+  return(out)
 }
 
 

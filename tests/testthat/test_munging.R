@@ -1,11 +1,32 @@
-context("munging functions examples")
+context("shorten_allele munging")
 
 test_that("shortern_allele examples work", {
-          expect_equal(shorten_allele("01:02:01:03"), "01:02")
-          expect_equal(shorten_allele("03:ADJRE"), "03:ADJRE")
-          expect_equal(shorten_allele("01:02:01:03", fields = 3), "01:02:01")
-
+  dat <- data.frame(HLA_A1 = c("01:02:01:03", "03:ADJRE", "01:02:01:01G"), stringsAsFactors = FALSE)
+  expect_equal(shorten_allele(dat$HLA_A1), c("01:02", "03:ADJRE", "01:02"))
+  expect_equal(shorten_allele(dat$HLA_A1, fields = 3), c("01:02:01", "03:ADJRE", "01:02:01"))
+  dat2 <- data.frame(HLA_A1 = c("01:02:01:03", "03:ADJRE", NA, "some_random_string", 2, ""), stringsAsFactors = FALSE)
+  expect_equal(shorten_allele(dat2$HLA_A1), c("01:02", "03:ADJRE", NA, "some_random_string", "2", NA))
 })
+
+test_that("shortern_allele examples work when allele column is factor", {
+  dat <- data.frame(HLA_A1 = c("01:02:01:03", "03:ADJRE", "01:02:01:01G"), stringsAsFactors = TRUE)
+  expect_equal(shorten_allele(dat$HLA_A1), c("01:02", "03:ADJRE", "01:02"))
+  expect_equal(shorten_allele(dat$HLA_A1, fields = 3), c("01:02:01", "03:ADJRE", "01:02:01"))
+  dat2 <- data.frame(HLA_A1 = c("01:02:01:03", "03:ADJRE", NA, "some_random_string", 2, ""), stringsAsFactors = TRUE)
+  expect_equal(shorten_allele(dat2$HLA_A1), c("01:02", "03:ADJRE", NA, "some_random_string", "2", NA))
+})
+
+test_that("shortern_allele works when input only one string", {
+  expect_equal(shorten_allele("01:02:01:03"), "01:02")
+})
+
+test_that("shortern_allele is ok with dplyr::rowwise() %>% mutate for legacy purposes", {
+  dat <- data.frame(HLA_A1 = c("01:02:01:03", "03:ADJRE", "01:02:01:01G"), stringsAsFactors = FALSE)
+  dat_mut <- dat %>% rowwise %>% mutate(HLA_A1 = shorten_allele(HLA_A1))
+  expect_equal(dat_mut$HLA_A1, c("01:02", "03:ADJRE", "01:02"))
+})
+
+context("first_KIR_field munging")
 
 
 test_that("first_KIR_field examples work", {

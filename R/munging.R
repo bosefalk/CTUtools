@@ -1,17 +1,21 @@
-#' Reduce allele string to specified number of fields
+#' Reduce HLA allele string to specified number of fields
 #'
-#' Reduce a long allele string (i.e. "01:02:01:03g") down to fewer fields,
-#' default being 2 fields. NMDP codes are preserved, trailing "g" are removed.
+#' Reduce a long HLA allele string (i.e. "01:02:01:03g") down to fewer fields,
+#' default being 2 fields. NMDP codes are preserved, trailing "G" are removed, NA or empty string input generates NA output,
+#' anything else is output as-is, cast as string. 
+#' No input or output validation is done on the data to ensure it meets expected HLA allele string formats. 
 #'
 #' @param allele String, including ":" but not initial "A*", so for example "01:02:01:03"
 #' @param fields Number of fields to keep, default = 2 which would return "01:02"
 #'
-#' @return String with shorterned fields
+#' @return character vector with shortened fields
 #'
 #' @examples
-#' shorten_allele("01:02:01:03")
-#' shorten_allele("03:ADJRE")
-#' shorten_allele("01:02:01:03", fields = 3)
+#' dat <- data.frame(HLA_A1 = c("01:02:01:03", "03:ADJRE", "01:02:01:01G"), stringsAsFactors = FALSE)
+#' shorten_allele(dat$HLA_A1)
+#' shorten_allele(dat$HLA_A1, fields = 3)
+#' dat2 <- data.frame(HLA_A1 = c("01:02:01:03", "03:ADJRE", NA, "some_random_string", 2, ""), stringsAsFactors = FALSE)
+#' shorten_allele(dat2$HLA_A1)
 shorten_allele <- function(allele, fields = 2) {
 
 
@@ -24,28 +28,35 @@ shorten_allele <- function(allele, fields = 2) {
   # Remove trailing g if present
   allele <- gsub("G$", "", allele)
 
-  split_allele <- strsplit(allele, ":")[[1]]
-  if (fields == 1) {
-    short_allele <- paste0(split_allele[1])
-  }
-
-  if (fields == 2) {
-    short_allele <- paste0(split_allele[1], ":", split_allele[2])
-  }
-
-  #TODO: Check this works for NMDP fields
-  if (fields == 3) {
-    short_allele <- paste0(split_allele[1], ":", split_allele[2], ":", split_allele[3])
-  }
-
-  #TODO: Check this works for NMDP fields
-  if (fields == 4) {
-    short_allele <- paste0(split_allele[1], ":", split_allele[2], ":", split_allele[3], ":", split_allele[4])
-  }
+  split_allele <- strsplit(allele, ":")
+  short_allele <- lapply(split_allele, function(x, .fields) {
+      
+    if (length(x) == 0) return(NA) # length(x) is 0 when input is ""
+    if (is.na(x[1])) return(NA) 
+    
+    
+    n_fields <- min(.fields, length(x))
+    if (n_fields == 1) {
+      joined <- paste(x[1], sep = ":")
+    }
+    if (n_fields == 2) {
+      joined <- paste(x[1], x[2], sep = ":")
+    }
+    if (n_fields == 3) {
+      joined <- paste(x[1], x[2], x[3], sep = ":")
+    }
+    if (n_fields == 4) {
+      joined <- paste(x[1], x[2], x[3], x[4], sep = ":")
+    }
+    return(joined)
+  }, .fields = fields)
+  
+  short_allele <- unlist(short_allele)
 
   return(short_allele)
 
 }
+
 
 #' Reduce KIR string to first field
 #'

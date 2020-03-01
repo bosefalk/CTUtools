@@ -2,7 +2,7 @@
 % Please edit documentation in R/munging.R
 \name{shorten_allele}
 \alias{shorten_allele}
-\title{Reduce allele string to specified number of fields}
+\title{Reduce HLA allele string to specified number of fields}
 \usage{
 shorten_allele(allele, fields = 2)
 }
@@ -12,14 +12,18 @@ shorten_allele(allele, fields = 2)
 \item{fields}{Number of fields to keep, default = 2 which would return "01:02"}
 }
 \value{
-String with shorterned fields
+character vector with shortened fields
 }
 \description{
-Reduce a long allele string (i.e. "01:02:01:03g") down to fewer fields,
-default being 2 fields. NMDP codes are preserved, trailing "g" are removed.
+Reduce a long HLA allele string (i.e. "01:02:01:03g") down to fewer fields,
+default being 2 fields. NMDP codes are preserved, trailing "G" are removed, NA or empty string input generates NA output,
+anything else is output as-is, cast as string. 
+No input or output validation is done on the data to ensure it meets expected HLA allele string formats.
 }
 \examples{
-shorten_allele("01:02:01:03")
-shorten_allele("03:ADJRE")
-shorten_allele("01:02:01:03", fields = 3)
+dat <- data.frame(HLA_A1 = c("01:02:01:03", "03:ADJRE", "01:02:01:01G"), stringsAsFactors = FALSE)
+shorten_allele(dat$HLA_A1)
+shorten_allele(dat$HLA_A1, fields = 3)
+dat2 <- data.frame(HLA_A1 = c("01:02:01:03", "03:ADJRE", NA, "some_random_string", 2, ""), stringsAsFactors = FALSE)
+shorten_allele(dat2$HLA_A1)
 }

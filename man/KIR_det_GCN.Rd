@@ -7,13 +7,13 @@
 KIR_det_GCN(kir_string, return_numeric = FALSE)
 }
 \arguments{
-\item{kir_string}{String with KIR info with the first field only (three characters), example "004+003|006+010"}
+\item{kir_string}{String with KIR info with the first field only (three characters), example "004+003|006+010", "NEG", "POS"}
 
-\item{return_numeric}{If set to TRUE, returns numeric GCN instead of character, sets "x" to NA and 2|3 to 2.5 etc}
+\item{return_numeric}{If set to TRUE, returns numeric GCN instead of character, sets "POS" to NA and 2|3 to 2.5 etc}
 }
 \value{
-Default a string with "x" if "POS", "0" if NEG, NA if NA or empty string, and otherwise the GCN. If \code{return_numeric = TRUE}
-instead returns a numeric value, where x results are NA and "2|3" are 2.5
+String vector with the gene copy number, with "x" if "POS", "0" if NEG, NA if NA or empty string. If \code{return_numeric = TRUE}
+instead returns a numeric vector, where POS results are NA and "2|3" are 2.5
 }
 \description{
 Determine KIR Gene Copy Number
@@ -24,4 +24,8 @@ str(KIR_det_GCN("004+003|006+010"))
 str(KIR_det_GCN("004+003|006+010", return_numeric = TRUE))
 KIR_det_GCN("POS")
 KIR_det_GCN("POS", return_numeric = TRUE)
+
+dat <- data.frame(kircol = c("004+003", "001", "008+008+008", "POS", "NEG", "", NA, "001|001+002"))
+KIR_det_GCN(dat$kircol)
+KIR_det_GCN(dat$kircol, return_numeric = TRUE)
 }

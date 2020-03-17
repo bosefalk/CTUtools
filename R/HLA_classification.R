@@ -131,8 +131,7 @@ HLA_Classification = function(allele,HLA_x_class){
 #' For example, if allel_c1 = "02:03", fields should be 2 (the default value). This does not actually apply
 #' any string manipulation to \code{allele_c1} & \code{allele_c2}, which needs to be done before passing to this function, 
 #' using \code{\link{shorten_allel}}
-#' @param HLA_C_class optional, dataframe from \code{\link{HLA_C_class_load}}, if not supplied this will be called within the function
-#' This option is here to pre-load this reference data, in case where you need to apply this function across a large number of subjects.
+#' @param HLA_C_class deprecated, used to pre-load classification data before this function was vectorized
 #'
 #' @return String vector with "C1/C1", "C1/C2", "C2/C2", or \code{NA_character_}
 #'
@@ -145,19 +144,22 @@ HLA_Classification = function(allele,HLA_x_class){
 #' @examples
 #' HLA_C_classification("01:02", "01:AWFCH")
 #' 
-#' dat <- data.frame(C1 = c("01:02", "02:03", "04:10"), C2 = c("01:AWFCH", "07:59", "05:50"), stringsAsFactors = FALSE)
+#' dat <- data.frame(C1 = c("01:02", "02:03", "04:10"), C2 = c("01:AWFCH", "07:59", "05:50"))
 #' HLA_C_classification(dat$C1, dat$C2)
 #' 
 #' # If either allele cannot be mapped to the reference data, NA is returned
-#' dat_odd <- data.frame(C1 = c("01:02", "01:02", "01:02"), C2 = c(NA, "", "07:02:01"), stringsAsFactors = FALSE)
+#' dat_odd <- data.frame(C1 = c("01:02", "01:02", "01:02"), C2 = c(NA, "", "07:02:01"))
 #' HLA_C_classification(dat_odd$C1, dat_odd$C2)
 HLA_C_classification = function(allele_c1, allele_c2, fields = 2, HLA_C_class = NULL){
 
   # TODO: Add verification input allele string are same length and structure as nchar
-  if (is.null(HLA_C_class)) {
-    HLA_C_class <- HLA_C_class_load(fields = fields)
+  if (!is.null(HLA_C_class)) {
+    warning("HLA_C_class argument is deprecated, classification data is always loaded internally")
   }
 
+  HLA_C_class <- HLA_C_class_load(fields = fields)
+  allele_c1 <- as.character(allele_c1)
+  allele_c2 <- as.character(allele_c2)
   
   c1 <- unlist(lapply(allele_c1, HLA_Classification, HLA_C_class))
   c2 <- unlist(lapply(allele_c2, HLA_Classification, HLA_C_class))
@@ -182,38 +184,51 @@ HLA_C_classification = function(allele_c1, allele_c2, fields = 2, HLA_C_class = 
 #' \code{\link{HLA_B_class_data}}, and returns the overall group. If either allele is 80I that's the overall group, if not then if either is 80T that's the group,
 #' otherwise Bw6.If either allel classification is unknown, returns NA.
 #'
-#' @param allele_b1 Allele, as string
-#' @param allele_b2 Allele, as string
+#' @param allel_b1 Allele column, as string
+#' @param allel_b2 Allele column, as string
 #' @param fields Number of fields from allele string reference document to use, should be same as number of fields in \code{allel_b1}.
-#' For example, if allel_b1 = "44:180", fields should be 2 (the default value). This does not actually apply
-#' any string manipulation to \code{allele_b1} & \code{b2}, which needs to be done before passing to this function.
-#' @param HLA_B_class optional, dataframe from \code{\link{HLA_B_class_load}}, if not supplied this will be called within the function
-#' This option is here to pre-load this reference data, in case where you need to apply this function across a large number of subjects.
+#' For example, if allel_b1 = "07:02", fields should be 2 (the default value). This does not actually apply
+#' any string manipulation to \code{allele_b1} & \code{allele_b2}, which needs to be done before passing to this function, 
+#' using \code{\link{shorten_allel}}
+#' @param HLA_C_class deprecated, used to pre-load classification data before this function was vectorized
 #'
-#'
-#' @return One of "Bw6", "Bw4 - 80T", "Bw4 - 80I", or \code{NA_character_}, as a string
+#' @return String vector with "Bw6", "Bw4 - 80T", "Bw4 - 80I", or \code{NA_character_}, as a string
 #'
 #' @seealso \code{\link{HLA_Classification}}, \code{\link{HLA_B_class_data}}
 #'
 #' @examples
-#' HLA_B_classification("44:180", "07:02")
-#' # For when you need to optimize execution time, pre-load the reference database
-#' referencedata <- HLA_B_class_load()
-#' HLA_B_classification("44:180", "07:02", HLA_B_class = referencedata)
+#' HLA_B_classification("07:02", "08:02")
+#' 
+#' dat <- data.frame(B1 = c("07:02", "07:02", "07:02"), B2 = c("07:36", "39:15", "08:02"))
+#' HLA_B_classification(dat$B1, dat$B2)
+#' 
+#' # If either allele cannot be mapped to the reference data, NA is returned
+#' dat_odd <- data.frame(B1 = c("07:02", "07:02", "07:02"), B2 = c(NA, "", "08:47"))
+#' HLA_B_classification(dat_odd$B1, dat_odd$B2)
 HLA_B_classification = function(allele_b1, allele_b2, fields = 2, HLA_B_class = NULL){
 
   # TODO: Add verification input allele string are same length and structure as nchar
-  if (is.null(HLA_B_class)) {
-    HLA_B_class <- HLA_B_class_load(fields = fields)
+  if (!is.null(HLA_B_class)) {
+    warning("HLA_B_class argument is deprecated, classification data is always loaded internally")
   }
   
-  b1 = HLA_Classification(allele_b1,HLA_B_class)
-  b2 = HLA_Classification(allele_b2,HLA_B_class)
+  HLA_B_class <- HLA_B_class_load(fields = fields)
+  allele_b1 <- as.character(allele_b1)
+  allele_b2 <- as.character(allele_b2)
+  
+  b1 <- unlist(lapply(allele_b1, HLA_Classification, HLA_B_class))
+  b2 <- unlist(lapply(allele_b2, HLA_Classification, HLA_B_class))
+  tmp_df <- data.frame(b1_class = b1, b2_class = b2, stringsAsFactors = FALSE)
 
   # If either is 80I that's the overall group, if not then if either is 80T that's the group, otherwise Bw6.
-  if (any(is.na(c(b1, b2)))) {return(NA_character_)}
-  if (any(c(b1, b2) == "Bw4 - 80I")) {return("Bw4 - 80I")}
-  if (any(c(b1, b2) == "Bw4 - 80T")) {return("Bw4 - 80T")}
-  if (all(c(b1, b2) == "Bw6")) {return("Bw6")}
-
+  out <- dplyr::case_when(
+    is.na(tmp_df$b1_class) | is.na(tmp_df$b2_class) ~ NA_character_,
+    tmp_df$b1_class == "Bw4 - 80I" | tmp_df$b2_class == "Bw4 - 80I" ~ "Bw4 - 80I",
+    tmp_df$b1_class == "Bw4 - 80T" | tmp_df$b2_class == "Bw4 - 80T" ~ "Bw4 - 80T",
+    tmp_df$b1_class == "Bw6" & tmp_df$b2_class == "Bw6" ~ "Bw6",
+    TRUE ~ NA_character_
+  )
+  
+  return(out)
+  
 }

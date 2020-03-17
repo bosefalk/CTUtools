@@ -12,8 +12,7 @@ For example, if allel_c1 = "02:03", fields should be 2 (the default value). This
 any string manipulation to \code{allele_c1} & \code{allele_c2}, which needs to be done before passing to this function, 
 using \code{\link{shorten_allel}}}
 
-\item{HLA_C_class}{optional, dataframe from \code{\link{HLA_C_class_load}}, if not supplied this will be called within the function
-This option is here to pre-load this reference data, in case where you need to apply this function across a large number of subjects.}
+\item{HLA_C_class}{deprecated, used to pre-load classification data before this function was vectorized}
 
 \item{allel_c1}{Allele column, as string}
 
@@ -34,11 +33,11 @@ The input alleles should be shortened to match the number of fields in the refer
 \examples{
 HLA_C_classification("01:02", "01:AWFCH")
 
-dat <- data.frame(C1 = c("01:02", "02:03", "04:10"), C2 = c("01:AWFCH", "07:59", "05:50"), stringsAsFactors = FALSE)
+dat <- data.frame(C1 = c("01:02", "02:03", "04:10"), C2 = c("01:AWFCH", "07:59", "05:50"))
 HLA_C_classification(dat$C1, dat$C2)
 
 # If either allele cannot be mapped to the reference data, NA is returned
-dat_odd <- data.frame(C1 = c("01:02", "01:02", "01:02"), C2 = c(NA, "", "07:02:01"), stringsAsFactors = FALSE)
+dat_odd <- data.frame(C1 = c("01:02", "01:02", "01:02"), C2 = c(NA, "", "07:02:01"))
 HLA_C_classification(dat_odd$C1, dat_odd$C2)
 }
 \seealso{

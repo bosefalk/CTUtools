@@ -4,23 +4,22 @@
 \alias{HLA_B_classification}
 \title{Classify overall group of HLA-B alleles}
 \usage{
-HLA_B_classification(allele_b1, allele_b2, fields = 2,
-  HLA_B_class = NULL)
+HLA_B_classification(allele_b1, allele_b2, fields = 2, HLA_B_class = NULL)
 }
 \arguments{
-\item{allele_b1}{Allele, as string}
-
-\item{allele_b2}{Allele, as string}
-
 \item{fields}{Number of fields from allele string reference document to use, should be same as number of fields in \code{allel_b1}.
-For example, if allel_b1 = "44:180", fields should be 2 (the default value). This does not actually apply
-any string manipulation to \code{allele_b1} & \code{b2}, which needs to be done before passing to this function.}
+For example, if allel_b1 = "07:02", fields should be 2 (the default value). This does not actually apply
+any string manipulation to \code{allele_b1} & \code{allele_b2}, which needs to be done before passing to this function, 
+using \code{\link{shorten_allel}}}
 
-\item{HLA_B_class}{optional, dataframe from \code{\link{HLA_B_class_load}}, if not supplied this will be called within the function
-This option is here to pre-load this reference data, in case where you need to apply this function across a large number of subjects.}
+\item{allel_b1}{Allele column, as string}
+
+\item{allel_b2}{Allele column, as string}
+
+\item{HLA_C_class}{deprecated, used to pre-load classification data before this function was vectorized}
 }
 \value{
-One of "Bw6", "Bw4 - 80T", "Bw4 - 80I", or \code{NA_character_}, as a string
+String vector with "Bw6", "Bw4 - 80T", "Bw4 - 80I", or \code{NA_character_}, as a string
 }
 \description{
 Takes two HLA-B alleles, classifies them individually into Bw6, Bw4 - 80I or Bw4 - 80T using \code{\link{HLA_Classification}} and
@@ -28,10 +27,14 @@ Takes two HLA-B alleles, classifies them individually into Bw6, Bw4 - 80I or Bw4
 otherwise Bw6.If either allel classification is unknown, returns NA.
 }
 \examples{
-HLA_B_classification("44:180", "07:02")
-# For when you need to optimize execution time, pre-load the reference database
-referencedata <- HLA_B_class_load()
-HLA_B_classification("44:180", "07:02", HLA_B_class = referencedata)
+HLA_B_classification("07:02", "08:02")
+
+dat <- data.frame(B1 = c("07:02", "07:02", "07:02"), B2 = c("07:36", "39:15", "08:02"))
+HLA_B_classification(dat$B1, dat$B2)
+
+# If either allele cannot be mapped to the reference data, NA is returned
+dat_odd <- data.frame(B1 = c("07:02", "07:02", "07:02"), B2 = c(NA, "", "08:47"))
+HLA_B_classification(dat_odd$B1, dat_odd$B2)
 }
 \seealso{
 \code{\link{HLA_Classification}}, \code{\link{HLA_B_class_data}}

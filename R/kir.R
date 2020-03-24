@@ -261,25 +261,27 @@ KIR3DL1_HLA_B_inhibiting <- function(KIR3DL1_assignment, HLA_B_overall, levels =
 
 #' KIR present/absent
 #'
-#' Determine whether the KIR is present, given a KIR string. Assumes an empty string, or a string with only "NEG" means the KIR is 
-#' absent, any other results means it's present - make sure the data follows this assumption before passing to this function.
+#' Determine whether the KIR is present, given a KIR string. Assumes a string with only "NEG" is absent, any other string not including
+#' "NEG" is present, if missing or some combination together with "NEG" return NA - see examples.
 #'
-#' @param string KIR string
+#' @param string KIR string vector
 #'
-#' @return TRUE if the KIR is present, FALSE if it's not present, NA if passed an empty/NA string
+#' @return logical vector, TRUE if the KIR is present, FALSE if it's not present, NA if passed an empty/NA string
 #'
 #' @examples
-#' KIR_present("003/034+003/034") # TRUE = present
-#' KIR_present("NEG") # FALSE = absent
-#' KIR_present("") # = NA
+#' dat <- data.frame(kirstring = c("003/034+003/034", "NEG", "", NA, "003|NEG"), stringsAsFactors = FALSE)
+#' KIR_present(dat$kirstring)
 KIR_present <- function(string) {
+  # if passed factor column
+  string <- as.character(string)
   # Assumes anything other than an empty string or a "NEG" KIR string means the gene is present
   # Need to make sure inputs are cleaned
   out <- case_when(
     is.na(string) ~ NA,
     grepl("^$", string) ~ NA,
     string == "NA" ~ NA,
-    string == "NEG" ~ FALSE,
-    TRUE ~ TRUE)
+    grepl("^NEG$", string) ~ FALSE, # Only NEG
+    grepl("NEG", string) ~ NA, # NEG with something else
+    TRUE ~ TRUE) # Otherwise present
   return(out)
 }

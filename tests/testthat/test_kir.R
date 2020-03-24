@@ -45,3 +45,15 @@ test_that("KIR3DL1_HLA_B_inhibiting examples work", {
   expect_equal(KIR3DL1_HLA_B_inhibiting(dat_factor$assignment_KIR3DL1, dat_factor$HLA_B_group), c("Strong inhibiting", "Weak inhibiting/noninhibiting", NA, "unknown"))
   
   })
+
+context("KIR_present function")
+
+test_that("KIR_present examples work", {
+  dat <- data.frame(kirstring = c("003/034+003/034", "NEG", "", NA, "003|NEG"), stringsAsFactors = FALSE)
+  expect_equal(KIR_present(dat$kirstring), c(TRUE, FALSE, NA, NA, NA))
+  # check for factor levels
+  dat_factor <- data.frame(kirstring = c("003/034+003/034", "NEG", "", NA, "003|NEG"), stringsAsFactors = FALSE)
+  expect_equal(KIR_present(dat_factor$kirstring), c(TRUE, FALSE, NA, NA, NA))
+  
+  
+})

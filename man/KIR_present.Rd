@@ -7,17 +7,16 @@
 KIR_present(string)
 }
 \arguments{
-\item{string}{KIR string}
+\item{string}{KIR string vector}
 }
 \value{
-TRUE if the KIR is present, FALSE if it's not present, NA if passed an empty/NA string
+logical vector, TRUE if the KIR is present, FALSE if it's not present, NA if passed an empty/NA string
 }
 \description{
-Determine whether the KIR is present, given a KIR string. Assumes an empty string, or a string with only "NEG" means the KIR is 
-absent, any other results means it's present - make sure the data follows this assumption before passing to this function.
+Determine whether the KIR is present, given a KIR string. Assumes a string with only "NEG" is absent, any other string not including
+"NEG" is present, if missing or some combination together with "NEG" return NA - see examples.
 }
 \examples{
-KIR_present("003/034+003/034") # TRUE = present
-KIR_present("NEG") # FALSE = absent
-KIR_present("") # = NA
+dat <- data.frame(kirstring = c("003/034+003/034", "NEG", "", NA, "003|NEG"), stringsAsFactors = FALSE)
+KIR_present(dat$kirstring)
 }

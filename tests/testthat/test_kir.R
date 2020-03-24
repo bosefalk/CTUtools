@@ -31,4 +31,17 @@ test_that("KIR3DL1_3DS1_assignment examples work", {
   expect_equal(KIR3DL1_3DS1_assignment(dat$kir_3DL1, dat$kir_3DS1), c("KIR3DL1-H", "unknown", "KIR3DL1-L"))
   
   
-}) 
+})
+
+context("KIR3DL1_HLA_B inhibiting function")
+
+test_that("KIR3DL1_HLA_B_inhibiting examples work", {
+  dat <- data.frame(assignment_KIR3DL1 = c("KIR3DL1-L", "KIR3DL1-N", "unknown", "unknown"), HLA_B_group = c("Bw4 - 80T", "Bw4 - 80I", NA, "Bw4 - 80I"), stringsAsFactors = FALSE)
+  expect_equal(KIR3DL1_HLA_B_inhibiting(dat$assignment_KIR3DL1, dat$HLA_B_group), c("Strong inhibiting", "Weak inhibiting/noninhibiting", NA, "unknown"))
+  expect_equal(KIR3DL1_HLA_B_inhibiting(dat$assignment_KIR3DL1, dat$HLA_B_group, levels = 3), c("Strong inhibiting", "noninhibiting", NA, "unknown"))
+  expect_equal(KIR3DL1_HLA_B_inhibiting(dat$assignment_KIR3DL1, dat$HLA_B_group, levels = 4), c("Strong inhibiting", "Educated, Uninhibited", NA, "unknown"))
+  # With factor dataframe
+  dat_factor <- data.frame(assignment_KIR3DL1 = c("KIR3DL1-L", "KIR3DL1-N", "unknown", "unknown"), HLA_B_group = c("Bw4 - 80T", "Bw4 - 80I", NA, "Bw4 - 80I"), stringsAsFactors = TRUE)
+  expect_equal(KIR3DL1_HLA_B_inhibiting(dat_factor$assignment_KIR3DL1, dat_factor$HLA_B_group), c("Strong inhibiting", "Weak inhibiting/noninhibiting", NA, "unknown"))
+  
+  })

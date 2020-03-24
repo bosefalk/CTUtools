@@ -50,4 +50,15 @@ test_that("shortern_allele input fields", {
   expect_error(shorten_allele("01:02:01:03", fields = "two"), "shortern_allele: fields can only be set to 1,2,3 or 4")
 })
 
+context("KIR first field")
+
+test_that("KIR_first_field examples work", {
+  dat <- data.frame(kirstring = c("0010101/0020102+0020103/0020104|0030105/0030106/0030107", "001/002", "NEG", "0010203+0020304|NEG", "POS", "", NA), stringsAsFactors = FALSE)
+  expect_equal(KIR_first_field(dat$kirstring), c("001/002+002|003", "001/002", "NEG", "001+002|NEG", "POS", NA, NA))
+  # Check with factor levels
+  dat_factor <- data.frame(kirstring = c("0010101/0020102+0020103/0020104|0030105/0030106/0030107", "001/002", "NEG", "0010203+0020304|NEG", "POS", "", NA), stringsAsFactors = TRUE)
+  expect_equal(KIR_first_field(dat_factor$kirstring), c("001/002+002|003", "001/002", "NEG", "001+002|NEG", "POS", NA, NA))
+  
+  
+})
 

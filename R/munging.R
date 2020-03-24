@@ -63,45 +63,47 @@ shorten_allele <- function(allele, fields = 2) {
 #' Reduce a long KIR string (i.e. "0010101/0020102+0020103/0020104|0030105/0030106/0030107") to keep only
 #' the first field, resulting in "001/002+002|003". Keeps all non-numeric entries intact (i.e. "NEG" or "POS")
 #'
-#' @param kir_string KIR string with /, + and | characters
+#' @param kir_string KIR string vector with /, + and | characters
 #'
-#' @return String with first KIR field only, removing duplicates
+#' @return String vector with first KIR field only, removing duplicates
 #'
 #' @examples
-#' KIR_first_field("0010101/0020102+0020103/0020104|0030105/0030106/0030107")
-#' KIR_first_field("001/002")
-#' KIR_first_field("0010203+0020304|NEG")
-#' KIR_first_field("POS")
+#' dat <- data.frame(kirstring = c("0010101/0020102+0020103/0020104|0030105/0030106/0030107", "001/002", "NEG", "0010203+0020304|NEG", "POS", "", NA), stringsAsFactors = FALSE)
+#' KIR_first_field(dat$kirstring)
 KIR_first_field <- function(kir_string) {
 
-  if (is.na(kir_string)) {return(NA_character_)}
-  if (kir_string == "") {return(NA_character_)}
+  kir_string <- as.character(kir_string)
   
-  # Finds two groups, first group is three digits, followed second group which is any number of
-  # digits, and removes the second group
-  st <- gsub("(\\d{3})(\\d*)", "\\1", kir_string)
-
-  # Starting from the lowest level, look within each group contained by a + sign for duplicates and remove these, then
-  # do the same for the groups contained by a | sign.
-  split_or <- strsplit(st, "\\|")
-  for (i in 1:length(split_or)) {
-    split_plus <- strsplit(split_or[[i]], "\\+")
-    for (j in 1:length(split_plus)) {
-      split_dash <- strsplit(split_plus[[j]], "/")
-      for (k in 1:length(split_dash)) {
-        split_dash[[k]] <- paste0(unique(split_dash[[k]]), collapse = "/")
+  output <- unlist(lapply(kir_string, function(.kir_string) {
+    if (is.na(.kir_string)) {return(NA_character_)}
+    if (.kir_string == "") {return(NA_character_)}
+    
+    # Finds two groups, first group is three digits, followed second group which is any number of
+    # digits, and removes the second group
+    st <- gsub("(\\d{3})(\\d*)", "\\1", .kir_string)
+    
+    # Starting from the lowest level, look within each group contained by a + sign for duplicates and remove these, then
+    # do the same for the groups contained by a | sign.
+    split_or <- strsplit(st, "\\|")
+    for (i in 1:length(split_or)) {
+      split_plus <- strsplit(split_or[[i]], "\\+")
+      for (j in 1:length(split_plus)) {
+        split_dash <- strsplit(split_plus[[j]], "/")
+        for (k in 1:length(split_dash)) {
+          split_dash[[k]] <- paste0(unique(split_dash[[k]]), collapse = "/")
+        }
+        
+        split_plus[[j]] <- paste0(split_dash, collapse = "+")
       }
-
-      split_plus[[j]] <- paste0(split_dash, collapse = "+")
+      
+      split_or[[i]] <- paste0(split_plus, collapse = "|")
     }
-
-    split_or[[i]] <- paste0(split_plus, collapse = "|")
-  }
-
-  st <- split_or
-
+    
+    return(split_or[[1]])
+  }))
+  
   # TODO: add output verification for no spaces, same number of pluses as in input etc
 
-  return(st[[1]])
+  return(output)
 
 }

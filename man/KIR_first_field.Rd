@@ -7,18 +7,16 @@
 KIR_first_field(kir_string)
 }
 \arguments{
-\item{kir_string}{KIR string with /, + and | characters}
+\item{kir_string}{KIR string vector with /, + and | characters}
 }
 \value{
-String with first KIR field only, removing duplicates
+String vector with first KIR field only, removing duplicates
 }
 \description{
 Reduce a long KIR string (i.e. "0010101/0020102+0020103/0020104|0030105/0030106/0030107") to keep only
 the first field, resulting in "001/002+002|003". Keeps all non-numeric entries intact (i.e. "NEG" or "POS")
 }
 \examples{
-KIR_first_field("0010101/0020102+0020103/0020104|0030105/0030106/0030107")
-KIR_first_field("001/002")
-KIR_first_field("0010203+0020304|NEG")
-KIR_first_field("POS")
+dat <- data.frame(kirstring = c("0010101/0020102+0020103/0020104|0030105/0030106/0030107", "001/002", "NEG", "0010203+0020304|NEG", "POS", "", NA), stringsAsFactors = FALSE)
+KIR_first_field(dat$kirstring)
 }

@@ -20,3 +20,15 @@ test_that("KIR_det_GCN works when passed factor column", {
                c("2", "1", "3", "x", "0", NA_character_, NA_character_, "1|2"))
   
 })
+
+context("KIR3DL1_3DS1 assignment")
+
+test_that("KIR3DL1_3DS1_assignment examples work", {
+  dat <- data.frame(kir_3DL1 = c("001/095+004", "POS", "005"), kir_3DS1 = c("NEG", "NEG", "013/107"), stringsAsFactors = FALSE)
+  expect_equal(KIR3DL1_3DS1_assignment(dat$kir_3DL1, dat$kir_3DS1), c("KIR3DL1-H", "unknown", "KIR3DL1-L"))
+  # Same with factor levels
+  dat <- data.frame(kir_3DL1 = c("001/095+004", "POS", "005"), kir_3DS1 = c("NEG", "NEG", "013/107"), stringsAsFactors = TRUE)
+  expect_equal(KIR3DL1_3DS1_assignment(dat$kir_3DL1, dat$kir_3DS1), c("KIR3DL1-H", "unknown", "KIR3DL1-L"))
+  
+  
+}) 

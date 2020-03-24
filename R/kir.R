@@ -55,20 +55,22 @@ KIR_det_GCN = function(kir_string, return_numeric = FALSE){
 #' 
 #' Uses the categorization from \code{\link{ASSIGN_KIR3DL1}}
 #' 
-#' @param KIR3DL1_string KIR3DL1 string with first fields only, i.e. "001/095+004". Can contain "NEG" and "POS".
-#' @param KIR3DS1_string KIR3DS1 string in same format
+#' @param KIR3DL1_string KIR3DL1 string vector with first fields only, i.e. "001/095+004". Can contain "NEG" and "POS".
+#' @param KIR3DS1_string KIR3DS1 string vector in same format
 #'
-#' @return String with "KIR3DL1-H", "KIR3DL1-L", "KIR3DL1-N" or "unknown"
+#' @return String vector with "KIR3DL1-H", "KIR3DL1-L", "KIR3DL1-N" or "unknown"
 #' 
 #' @seealso \code{\link{ASSIGN_KIR3DL1}}
 #'
 #' @examples
 #'
-#' KIR3DL1_3DS1_assignment("001/095+004", "NEG")
-#' KIR3DL1_3DS1_assignment("POS", "NEG")
-#' KIR3DL1_3DS1_assignment("005", "013/107")
-
+#' dat <- data.frame(kir_3DL1 = c("001/095+004", "POS", "005"), kir_3DS1 = c("NEG", "NEG", "013/107"), stringsAsFactors = FALSE)
+#' KIR3DL1_3DS1_assignment(dat$kir_3DL1, dat$kir_3DS1)
 KIR3DL1_3DS1_assignment <- function(KIR3DL1_string, KIR3DS1_string) {
+  
+  # If passed as factor variables pass to character
+  KIR3DL1_string <- as.character(KIR3DL1_string)
+  KIR3DS1_string <- as.character(KIR3DS1_string)
   
   # This whole function was written by Henning for reading in LSL data in 1701 project. It's just inserted here pretty 
   # much as-is, with just minor tweaks to inputs and outputs (hence why the comments are in German).
@@ -79,11 +81,15 @@ KIR3DL1_3DS1_assignment <- function(KIR3DL1_string, KIR3DS1_string) {
   }
   
   
+  
   # Sub-functions -----------------------------------------------------------
   
   KIR_class = function(kir_glstring){
-    kir_result = Extract_GLstring_KIR(kir_glstring)
-    return(KIR_result_class(kir_result))
+    kir_result = lapply(kir_glstring, Extract_GLstring_KIR)
+    #kir_result <- Extract_GLstring_KIR(kir_glstring)
+    #KIR_result_class(kir_result)
+    out = lapply(kir_result, KIR_result_class)
+    return(out)
   }
   
   
@@ -155,7 +161,7 @@ KIR3DL1_3DS1_assignment <- function(KIR3DL1_string, KIR3DS1_string) {
       }
       result = plyr::join(result,assignment_KIR3DL1,by = "subtype") 
       ## !!! Annahme: Bei mind. 3 Allelen werden die beiden st?rksten Inhibierungseffekte gesucht
-      result_phase = plyr::ddply(result, .(Phase), function(z){
+      result_phase = plyr::ddply(result, "Phase", function(z){
         z = z[order(z$num)[1:2],]
         c(class_i = as.character(paste(z$subtype,collapse = "/")),
           overall_i = as.character(z$overall[1]))
@@ -175,19 +181,26 @@ KIR3DL1_3DS1_assignment <- function(KIR3DL1_string, KIR3DS1_string) {
   
   
   ## Wenn kir3ds1 positiv ist oder ein neues Allel typisiert wurde, wird per se ein "s" klassifiziert
-  if (grepl("NEW",KIR3DS1_string) | grepl("POS",KIR3DS1_string)){
-    x2 = gsub("NEW","sss",KIR3DS1_string)
+  kir3dl1.3ds1_GLstring <- unlist(lapply(kir3dl1.3ds1_GLstring, FUN = function (x) {
+    if (grepl("NEW",x) | grepl("POS",x)){
+    x2 = gsub("NEW","sss",x)
     x2 = gsub("POS","sss",x2)
-    kir3dl1.3ds1_GLstring = paste(KIR3DL1_string,gsub("NEW","sss",x2), sep = "+")
+    out = paste(x,gsub("NEW","sss",x2), sep = "+")
+    return(out)
+    } else {
+    return(x)
   }
+    }))
   
   kir3dl1.3ds1_result  = KIR_class(kir3dl1.3ds1_GLstring)
   
-  kir3dl1.3ds1_diff    = kir3dl1.3ds1_result[[1]]
-  kir3dl1.3ds1_class   = kir3dl1.3ds1_result[[2]]
-  kir3dl1.3ds1_overall = kir3dl1.3ds1_result[[3]]
+  #kir3dl1.3ds1_diff    = kir3dl1.3ds1_result[[1]]
+  #kir3dl1.3ds1_class   = kir3dl1.3ds1_result[[2]]
+  #kir3dl1.3ds1_overall = kir3dl1.3ds1_result[[3]]
   
-  return(kir3dl1.3ds1_overall)
+  overall <- unlist(lapply(kir3dl1.3ds1_result, function(x) return(x[[3]])))
+  
+  return(overall)
   
 }
 

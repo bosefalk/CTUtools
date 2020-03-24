@@ -7,21 +7,20 @@
 KIR3DL1_3DS1_assignment(KIR3DL1_string, KIR3DS1_string)
 }
 \arguments{
-\item{KIR3DL1_string}{KIR3DL1 string with first fields only, i.e. "001/095+004". Can contain "NEG" and "POS".}
+\item{KIR3DL1_string}{KIR3DL1 string vector with first fields only, i.e. "001/095+004". Can contain "NEG" and "POS".}
 
-\item{KIR3DS1_string}{KIR3DS1 string in same format}
+\item{KIR3DS1_string}{KIR3DS1 string vector in same format}
 }
 \value{
-String with "KIR3DL1-H", "KIR3DL1-L", "KIR3DL1-N" or "unknown"
+String vector with "KIR3DL1-H", "KIR3DL1-L", "KIR3DL1-N" or "unknown"
 }
 \description{
 Uses the categorization from \code{\link{ASSIGN_KIR3DL1}}
 }
 \examples{
 
-KIR3DL1_3DS1_assignment("001/095+004", "NEG")
-KIR3DL1_3DS1_assignment("POS", "NEG")
-KIR3DL1_3DS1_assignment("005", "013/107")
+dat <- data.frame(kir_3DL1 = c("001/095+004", "POS", "005"), kir_3DS1 = c("NEG", "NEG", "013/107"), stringsAsFactors = FALSE)
+KIR3DL1_3DS1_assignment(dat$kir_3DL1, dat$kir_3DS1)
 }
 \seealso{
 \code{\link{ASSIGN_KIR3DL1}}

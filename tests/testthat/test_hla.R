@@ -29,3 +29,21 @@ test_that("HLA-B classification works with factor columns", {
   expect_equal(HLA_B_classification(dat$B1, dat$B2), c("Bw4 - 80I", "Bw6", "Bw4 - 80T"))
   
 })
+
+context("HLA generic classification")
+
+
+test_that("HLA_Classification examples work", {
+  dat <- data.frame(HLA_C = c("01:02", "01:AWFCH"), HLA_B = c("07:02", NA),stringsAsFactors = FALSE)
+  HLA_C_class <- HLA_C_class_load()
+  expect_equal(HLA_Classification(dat$HLA_C, HLA_C_class), c("C1", "C1"))
+  HLA_B_class <- HLA_B_class_load()
+  expect_equal(HLA_Classification(dat$HLA_B, HLA_B_class), c("Bw6", NA))
+  
+  dat_factor <- data.frame(HLA_C = c("01:02", "01:AWFCH"), HLA_B = c("07:02", NA),stringsAsFactors = TRUE)
+  expect_equal(HLA_Classification(dat_factor$HLA_C, HLA_C_class), c("C1", "C1"))
+  expect_equal(HLA_Classification(dat_factor$HLA_B, HLA_B_class), c("Bw6", NA))
+  
+})
+
+

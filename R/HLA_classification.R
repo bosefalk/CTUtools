@@ -72,26 +72,27 @@ HLA_B_class_load <- function(fields = 2) {
 #' Classifies an allele according to a reference dataframe. If an NMDP code is present, class is given if all possible
 #' alleles are the same class, otherwise returns NA
 #'
-#' @param allele An allele string, including ":" characers but not the initial "C*"
+#' @param allele An HLA allele string vector, including ":" characers but not the initial "C*"
 #' @param HLA_x_class HLA classification reference data.frame (such as constructed by for example \code{HLA_C_class_load()}), must
 #' contain columns Allele (where the number of fields is the same as in \code{allele}) and Class.
 #'
-#' @return String with classification group from reference document, NA if unknown
+#' @return String vector with classification group from reference document, NA if unknown
 #'
 #' @seealso \code{\link{HLA_C_classification}}, \code{\link{HLA_B_classification}},
 #' \code{\link{HLA_C_class_load}}, \code{\link{HLA_B_class_load}}, \code{\link{NMDP}}
 #'
 #' @examples
+#' 
+#' dat <- data.frame(HLA_C = c("01:02", "01:AWFCH"), HLA_B = c("07:02", NA),stringsAsFactors = FALSE)
 #' HLA_C_class <- HLA_C_class_load()
-#' HLA_Classification("01:02", HLA_C_class)
-#' HLA_Classification("01:AWFCH", HLA_C_class)
+#' HLA_Classification(dat$HLA_C, HLA_C_class)
 #' HLA_B_class <- HLA_B_class_load()
-#' HLA_Classification("07:02", HLA_B_class)
+#' HLA_Classification(dat$HLA_B, HLA_B_class)
 HLA_Classification = function(allele,HLA_x_class){
 
+  allele <- as.character(allele)
+  out <- unlist(lapply(allele, function(xx) {
   #data(NMDP")
-
-  xx = allele
 
   xclass = HLA_x_class$Class[HLA_x_class$Allele==xx] #Wenn kein Analysenfehler und kein NMDP Code
   if (length(xclass)==0) xclass <- NA_character_
@@ -118,6 +119,9 @@ HLA_Classification = function(allele,HLA_x_class){
 
   }
   return(xclass)
+  }))
+  
+  return(out)
 }
 
 #' Classify HLA-C alleles into C1 & C2 groups

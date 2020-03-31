@@ -16,7 +16,9 @@
 #' 
 #' \code{\link{KIR3DL1_3DS1_assignment}}: Classifies KIR 3DL1 & 3DS1 alleles into KIR3DL1-H, -L, -N
 #' 
-#'
+#' @section Score functions:
+#' 
+#' \code{\link{score_boelen_inhib}}: Boelen inhibitory score calculation
 #'
 #' @section Datasets:
 #'

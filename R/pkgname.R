@@ -19,6 +19,10 @@
 #' @section Score functions:
 #' 
 #' \code{\link{score_boelen_inhib}}: Boelen inhibitory score calculation
+#' 
+#' \code{\link{score_krieger}}: Krieger inhibitory and activating KIR score calculation
+#' 
+#' \code{\link{score_rafei}}: Rafei varation of Kreiger scores
 #'
 #' @section Datasets:
 #'

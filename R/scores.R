@@ -141,3 +141,401 @@ score_boelen_inhib <- function(df, include_3DL1 = FALSE, separate_2DL2_2DL3 = TR
 }
 
 
+
+
+
+
+
+#' @noRd
+#' 
+#' Mapping between commonly used column names from Henning to Bose, i.e. kir2ds1 to kir_2DS1
+map_score_df <- function(df) {
+  # Henning uses a slightly different naming convention:
+  henning_cols <- c("kir2dl1", "kir2dl2", "kir2dl3", "kir3dl1", "kir3dl2", "kir2ds1", "kir2ds2", 
+                    "kir2ds4", "kir2ds5", 
+                    "hla_c_class.pat", "hla_b_class.pat") 
+  try(df <- dplyr::rename(df, kir_2DL1 = kir2dl1), silent = TRUE)
+  try(df <- dplyr::rename(df, kir_2DL2 = kir2dl2), silent = TRUE)
+  try(df <- dplyr::rename(df, kir_2DL3 = kir2dl3), silent = TRUE)
+  try(df <- dplyr::rename(df, kir_3DL1 = kir3dl1), silent = TRUE)
+  try(df <- dplyr::rename(df, kir_3DL2 = kir3dl2), silent = TRUE)
+  try(df <- dplyr::rename(df, kir_2DS1 = kir2ds1), silent = TRUE)
+  try(df <- dplyr::rename(df, kir_2DS2 = kir2ds2), silent = TRUE)
+  try(df <- dplyr::rename(df, kir_2DS4 = kir2ds4), silent = TRUE)
+  try(df <- dplyr::rename(df, kir_2DS4N = kir2ds4N), silent = TRUE)
+  try(df <- dplyr::rename(df, kir_2DS5 = kir2ds5), silent = TRUE)
+  try(df <- dplyr::rename(df, kir_3DS1 = kir3ds1), silent = TRUE)
+  try(df <- dplyr::rename(df, C_class = hla_c_class.pat), silent = TRUE)
+  try(df <- dplyr::rename(df, B_class = hla_b_class.pat), silent = TRUE)
+  
+  required_cols <- c("kir_2DL1", "kir_2DL2", "kir_2DL3", "kir_3DL1", "kir_3DL2", "kir_2DS1", "kir_2DS2",
+                     "kir_2DS4", "kir_2DS5", "kir_3DS1",
+                     "C_class", "B_class")
+  for (i in 1:length(required_cols)) {
+   if (!required_cols[i] %in% names(df)) stop(paste("Column", required_cols[i], "/", henning_cols[i], "not in input dataframe"))
+   df[[required_cols[i]]] <- as.character(df[[required_cols[i]]]) # Transform from factor vector
+  }
+  
+  # For HLA allele columns, can either pass a joined column or two separate:
+  if (!"hla_a" %in% names(df)) {
+    if ("A1" %in% names(df) & "A2" %in% names(df)) {
+      df$hla_a <- paste0(df$A1, "/", df$A2) %>% ifelse(grepl("NA", .), NA, .) %>% ifelse(grepl("^/", .) | grepl("/$", .), NA, .)
+    }
+    if ("a1" %in% names(df) & "a2" %in% names(df)) {
+      df$hla_a <- paste0(df$a1, "/", df$a2) %>% ifelse(grepl("NA", .), NA, .) %>% ifelse(grepl("^/", .) | grepl("/$", .), NA, .)
+    }
+    if (!"hla_a" %in% names(df)) stop("HLA-A column(s) not in input dataframe")
+  }
+  if (!"hla_b" %in% names(df)) {
+    if ("B1" %in% names(df) & "B2" %in% names(df)) {
+      df$hla_b <- paste0(df$B1, "/", df$B2) %>% ifelse(grepl("NA", .), NA, .) %>% ifelse(grepl("^/", .) | grepl("/$", .), NA, .)
+    }
+    if ("b1" %in% names(df) & "b2" %in% names(df)) {
+      df$hla_b <- paste0(df$b1, "/", df$b2) %>% ifelse(grepl("NA", .), NA, .) %>% ifelse(grepl("^/", .) | grepl("/$", .), NA, .)
+    }
+    if (!"hla_b" %in% names(df)) stop("HLA-B column(s) not in input dataframe")
+  }
+  if (!"hla_c" %in% names(df)) {
+    if ("C1" %in% names(df) & "C2" %in% names(df)) {
+      df$hla_c <- paste0(df$C1, "/", df$C2) %>% ifelse(grepl("NA", .), NA, .) %>% ifelse(grepl("^/", .) | grepl("/$", .), NA, .)
+    }
+    if ("c1" %in% names(df) & "c2" %in% names(df)) {
+      df$hla_c <- paste0(df$a1, "/", df$a2) %>% ifelse(grepl("NA", .), NA, .) %>% ifelse(grepl("^/", .) | grepl("/$", .), NA, .)
+    }
+    if (!"hla_c" %in% names(df)) stop("HLA-C column(s) not in input dataframe")
+  }
+ 
+  return(df) 
+}
+
+#' Krieger inhibitory KIR scores
+#' 
+#' Calculates the Krieger scores for inhibitory / activating KIRs - see publication below
+#'
+#' @param data.frame with the following columns:
+#' * KIR allele strings, named "kir_2DL1" or "kir2dl1"
+#' * HLA-A, B and C allele string, either as one column named "hla_a", or as two "A1" "A2"
+#' * C- and B- ligand class column, named "B_class" & "C_class" (or "hla_c_class.pat")
+#' @param count_2DS4N_as_2DS4 Default FALSE, if set to TRUE 2DS4 is considered present if 2DS4 or 2DS4N is present
+#'
+#' @return data.frame with the following columns, all as numeric:
+#' * kirl_score
+#' * imkir_score
+#' * wkir_score
+#' 
+#' @export
+#' @md
+#' @source Krieger et al, Killer Immunoglobulin-Like Receptor-Ligand Interactions Predict Clinical Outcomes following Unrelated Donor Transplantations, 
+#' Biol Blood Marrow Transplant. 2019 Oct 30, https://www.ncbi.nlm.nih.gov/pubmed/31676338
+#'
+#' @examples
+#' # Create example dataframe
+#' dat <- structure(list(kir_2DL1 = 1L, kir_2DL2 = 1L, kir_2DL3 = "NEG", 
+#' kir_3DL1 = "NEG", kir_3DL2 = 1L, kir_2DS1 = 1L, kir_2DS2 = "NEG", 
+#' kir_2DS4 = 1L, kir_2DS4N = "NEG", kir_2DS5 = 1L, kir_3DS1 = 1L, 
+#' C_class = "C1/C1", B_class = "Bw6/Bw4-80T", A1 = "01:01", 
+#' A2 = "01:01", B1 = "01:01", B2 = "01:01", C1 = "01:01", C2 = "01:01"), class = "data.frame", row.names = c(NA, 
+#'                                                                                                           -1L))
+#' score_krieger(dat)
+score_krieger = function(df, count_2DS4N_as_2DS4 = FALSE) {
+  
+  df <- map_score_df(df)
+  
+  df <- df %>% mutate(pres_2DL1 = CTUtools::KIR_present(kir_2DL1), 
+                      pres_2DL2 = CTUtools::KIR_present(kir_2DL2),
+                      pres_2DL3 = CTUtools::KIR_present(kir_2DL3),
+                      pres_3DL1 = CTUtools::KIR_present(kir_3DL1),
+                      pres_3DL2 = CTUtools::KIR_present(kir_3DL2),
+                      pres_2DS1 = CTUtools::KIR_present(kir_2DS1),
+                      pres_2DS2 = CTUtools::KIR_present(kir_2DS2),
+                      pres_2DS4 = CTUtools::KIR_present(kir_2DS4),
+                      pres_2DS5 = CTUtools::KIR_present(kir_2DS5),
+                      pres_3DS1 = CTUtools::KIR_present(kir_3DS1))
+  
+  # Count 2DS4 as present if 2DS4N is present
+  if (count_2DS4N_as_2DS4 == TRUE) {
+    df$pres_2DS4N <- CTUtools::KIR_present(df$kir_2DS4N)
+    df$pres_2DS4 <- as.logical(max(df$pres_2DS4, df$pres_2DS4N, na.rm = TRUE))
+  }
+  
+  # For the inhibitory kirs, if the ligand is present the _ligand score is set to 1, and the _missing_ligand score is 0 - if the
+  # ligand is missing its the other way around.
+  # Activating kirs only record 1 when ligand is present, no missing ligand value
+  # These three sets (inhibitory ligand, inhibitory missing ligand, activating ligand) of scores are added together, and
+  # used in different configurations for different score calculations - see below
+  
+  # 2DL1 ligand is C2
+  df$kir2dl1_ligand <- case_when(
+    is.na(df$pres_2DL1) | df$pres_2DL1 == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    df$pres_2DL1 & grepl("C2", df$C_class) ~ 1,
+    TRUE ~ 0
+  )
+  df$kir2dl1_missing_ligand <- case_when(
+    is.na(df$pres_2DL1) | df$pres_2DL1 == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    df$pres_2DL1 & !grepl("C2", df$C_class) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 2DL2 ligand is C1
+  df$kir2dl2_ligand <- case_when(
+    is.na(df$pres_2DL2) | df$pres_2DL2 == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    df$pres_2DL2 & grepl("C1", df$C_class) ~ 1,
+    TRUE ~ 0
+  )
+  df$kir2dl2_missing_ligand <- case_when(
+    is.na(df$pres_2DL2) | df$pres_2DL2 == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    df$pres_2DL2 & !grepl("C1", df$C_class) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 2DL3 ligand is C1
+  df$kir2dl3_ligand <- case_when(
+    is.na(df$pres_2DL3) | df$pres_2DL3 == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    df$pres_2DL3 & grepl("C1", df$C_class) ~ 1,
+    TRUE ~ 0
+  )
+  df$kir2dl3_missing_ligand <- case_when(
+    is.na(df$pres_2DL3) | df$pres_2DL3 == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    df$pres_2DL3 & !grepl("C1", df$C_class) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 3DL1 ligand is Bw4
+  df$kir3dl1_ligand <- case_when(
+    is.na(df$pres_3DL1) | df$pres_3DL1 == "" ~ NA_real_,
+    is.na(df$B_class) | df$B_class == "" ~ NA_real_,
+    df$pres_3DL1 & grepl("Bw4", df$B_class) ~ 1,
+    TRUE ~ 0
+  )
+  df$kir3dl1_missing_ligand <- case_when(
+    is.na(df$pres_3DL1) | df$pres_3DL1 == "" ~ NA_real_,
+    is.na(df$B_class) | df$B_class == "" ~ NA_real_,
+    df$pres_3DL1 & !grepl("Bw4", df$B_class) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 3DL2 ligand is A11/A3
+  df$kir3dl2_ligand <- case_when(
+    is.na(df$pres_3DL2) | df$pres_3DL2 == "" ~ NA_real_,
+    is.na(df$hla_a) | df$hla_a == "" ~ NA_real_,
+    df$pres_3DL2 & (grepl("11[:]", df$hla_a) | grepl("03[:]", df$hla_a)) ~ 1,
+    TRUE ~ 0
+  )
+  df$kir3dl2_missing_ligand <- case_when(
+    is.na(df$pres_3DL2) | df$pres_3DL2 == "" ~ NA_real_,
+    is.na(df$hla_a) | df$hla_a == "" ~ NA_real_,
+    df$pres_3DL2 & !(grepl("11[:]", df$hla_a) | grepl("03[:]", df$hla_a)) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 2DS1 ligand is C2
+  df$kir2ds1_ligand <- case_when(
+    is.na(df$pres_2DS1) | df$pres_2DS1 == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    df$pres_2DS1 & grepl("C2", df$C_class) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 2DS2 ligand is A11
+  df$kir2ds2_ligand <- case_when(
+    is.na(df$pres_2DS2) | df$pres_2DS2 == "" ~ NA_real_,
+    is.na(df$hla_a) | df$hla_a == "" ~ NA_real_,
+    df$pres_2DS2 & (grepl("11[:]", df$hla_a)) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 2DS4 ligand is A11
+  df$kir2ds4_ligand <- case_when(
+    is.na(df$pres_2DS4) | df$pres_2DS4 == "" ~ NA_real_,
+    is.na(df$hla_a) | df$hla_a == "" ~ NA_real_,
+    df$pres_2DS4 & (grepl("11[:]", df$hla_a)) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 2DS5 ligand is C2
+  df$kir2ds5_ligand <- case_when(
+    is.na(df$pres_2DS4) | df$pres_2DS4 == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    df$pres_2DS5 & grepl("C2", df$C_class) ~ 1,
+    TRUE ~ 0
+  )
+  
+  
+  # ikir is the inhibitory kir score, mkir is missing ligand inhibitory kir score, akir is activating ligand kir score
+  df$ikir = df$kir2dl1_ligand+df$kir2dl2_ligand+df$kir2dl3_ligand+df$kir3dl1_ligand+df$kir3dl2_ligand
+  df$mkir = df$kir2dl1_missing_ligand+df$kir2dl2_missing_ligand+df$kir2dl3_missing_ligand+
+    df$kir3dl1_missing_ligand+df$kir3dl2_missing_ligand
+  df$akir = df$kir2ds1_ligand+df$kir2ds2_ligand+df$kir2ds4_ligand+df$kir2ds5_ligand
+  
+  # 3 possible scores can be constructed from these, these columns are returned from the function
+  df$kirl_score = -df$ikir + df$mkir + df$akir
+  df$imkir_score = df$ikir + df$mkir
+  df$wkir_score = 0.80 * df$ikir + 0.14 * df$akir + 0.99 * df$mkir
+  
+    return(df %>% select(kirl_score, imkir_score, wkir_score))
+}
+
+
+
+
+#' Rafei inhibitory KIR scores
+#' 
+#' Calculates the Rafei scores for inhibitory / activating KIRs, adjusted version of Krieger scores - see publication below
+#'
+#' @param df data.frame with the following columns:
+#' * KIR allele strings, named "kir_2DL1" or "kir2dl1"
+#' * HLA-A, B and C allele string, either as one column named "hla_a", or as two "A1" "A2"
+#' * C- and B- ligand class column, named "B_class" & "C_class" (or "hla_c_class.pat")
+#' @param count_2DS4N_as_2DS4 Default FALSE, if set to TRUE 2DS4 is considered present if 2DS4 or 2DS4N is present
+#'
+#' @return data.frame with the following columns, all as numeric:
+#' * rafei_inh_kl_matches_2cat
+#' * rafei_act_kl_matches_2cat
+#' * rafei_inact_kl_matches_2cat
+#' 
+#' @export
+#' @md
+#' @source Rafei et al, Role of killer cell immunoglobulin-like receptor (KIR)-ligand interactions to prevent relapse in patients (pts) receiving matched unrelated stem cell transplant (SCT) for acute myeloid leukemia (AML).
+#' Journal of Clinical Oncology 37, https://ascopubs.org/doi/abs/10.1200/JCO.2019.37.15_suppl.7049
+#'
+#' @examples
+#' # Create example dataframe
+#' dat <- structure(list(kir_2DL1 = 1L, kir_2DL2 = 1L, kir_2DL3 = "NEG", 
+#' kir_3DL1 = "NEG", kir_3DL2 = 1L, kir_2DS1 = 1L, kir_2DS2 = "NEG", 
+#' kir_2DS4 = 1L, kir_2DS4N = "NEG", kir_2DS5 = 1L, kir_3DS1 = 1L, 
+#' C_class = "C1/C1", B_class = "Bw6/Bw4-80T", A1 = "01:01", 
+#' A2 = "01:01", B1 = "01:01", B2 = "01:01", C1 = "01:01", C2 = "01:01"), class = "data.frame", row.names = c(NA, 
+#'                                                                                                           -1L))
+#' score_rafei(dat)
+score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
+  
+  df <- map_score_df(df)
+  
+  df <- df %>% mutate(pres_2DL1 = CTUtools::KIR_present(kir_2DL1), 
+                      pres_2DL2 = CTUtools::KIR_present(kir_2DL2),
+                      pres_2DL3 = CTUtools::KIR_present(kir_2DL3),
+                      pres_3DL1 = CTUtools::KIR_present(kir_3DL1),
+                      pres_3DL2 = CTUtools::KIR_present(kir_3DL2),
+                      pres_2DS1 = CTUtools::KIR_present(kir_2DS1),
+                      pres_2DS2 = CTUtools::KIR_present(kir_2DS2),
+                      pres_2DS4 = CTUtools::KIR_present(kir_2DS4),
+                      pres_2DS5 = CTUtools::KIR_present(kir_2DS5),
+                      pres_3DS1 = CTUtools::KIR_present(kir_3DS1))
+  
+  # Count 2DS4 as present if 2DS4N is present
+  if (count_2DS4N_as_2DS4 == TRUE) {
+    df$pres_2DS4N <- CTUtools::KIR_present(df$kir_2DS4N)
+    df$pres_2DS4 <- as.logical(max(df$pres_2DS4, df$pres_2DS4N, na.rm = TRUE))
+  }
+  
+  # 2DL1 ligand is same as Krieger score, C2
+  df$kir2dl1_ligand <- case_when(
+    is.na(df$pres_2DL1) | df$pres_2DL1 == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    df$pres_2DL1 & grepl("C2", df$C_class) ~ 1,
+    TRUE ~ 0
+  )
+
+  # 2DL2 ligand v2 is C1 or B46:01 or B73:01 are present
+  df$kir2dl2_ligand_v2 <- case_when(
+    is.na(df$pres_2DL2) | df$pres_2DL2 == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$hla_b) | df$hla_b == "" ~ NA_real_,
+    df$pres_2DL2 & grepl("C1", df$C_class) ~ 1,
+    df$pres_2DL2 & (grepl("46[:]01",df$hla_b) | grepl("73[:]01",df$hla_b)) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 2DL3 ligand is 2 if both if both C1 and B46:01 or B73:01 are present, 1 if only either C1 or the HLA-B alleles are present and 0 otherwise
+  df$kir2dl3_ligand_v2 <- case_when(
+    is.na(df$pres_2DL3) | df$pres_2DL3 == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$hla_b) | df$hla_b == "" ~ NA_real_,
+    df$pres_2DL3 & grepl("C1", df$C_class) & (grepl("46[:]01",df$hla_b) | grepl("73[:]01",df$hla_b)) ~ 2,
+    df$pres_2DL3 & grepl("C1", df$C_class) ~ 1,
+    df$pres_2DL3 & (grepl("46[:]01",df$hla_b) | grepl("73[:]01",df$hla_b)) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 3DL1 ligand is same as Krieger, Bw4
+  df$kir3dl1_ligand <- case_when(
+    is.na(df$pres_3DL1) | df$pres_3DL1 == "" ~ NA_real_,
+    is.na(df$B_class) | df$B_class == "" ~ NA_real_,
+    df$pres_3DL1 & grepl("Bw4", df$B_class) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 3DL2 ligand is same as Krieger, A11/A3
+  df$kir3dl2_ligand <- case_when(
+    is.na(df$pres_3DL2) | df$pres_3DL2 == "" ~ NA_real_,
+    is.na(df$hla_a) | df$hla_a == "" ~ NA_real_,
+    df$pres_3DL2 & (grepl("11[:]", df$hla_a) | grepl("03[:]", df$hla_a)) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 2DS1 ligand v2 is no longer just C2, instead only specific HLA-C alleles
+  df$kir2ds1_ligand_v2 <- case_when(
+    is.na(df$pres_2DS1) | df$pres_2DS1 == "" ~ NA_real_,
+    is.na(df$hla_c) ~ NA_real_,
+    df$pres_2DS1 & (grepl("02[:]02",df$hla_c) | 
+                      grepl("04[:]01",df$hla_c) |
+                      grepl("05[:]01",df$hla_c) |
+                      grepl("06[:]02",df$hla_c) |
+                      grepl("17[:]0",df$hla_c) |
+                      grepl("18[:]02",df$hla_c)) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 2DS2 ligand v2 is now specifically A11:01 instead of any A11
+  df$kir2ds2_ligand_v2 <- case_when(
+    is.na(df$pres_2DS2) | df$pres_2DS2 == "" ~ NA_real_,
+    is.na(df$hla_a) | df$hla_a == "" ~ NA_real_,
+    df$pres_2DS2 & (grepl("11[:]01", df$hla_a) | grepl("11[:]01", df$hla_a)) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 2DS4 ligand v2 is now a few specific HLA-C alleles as well as A11:01 and A11:02 instead of just A11
+  df$kir2ds4_ligand_v2 <- case_when(
+    is.na(df$pres_2DS4) | df$pres_2DS4 == "" ~ NA_real_,
+    is.na(df$hla_c) | df$hla_c == "" ~ NA_real_,
+    is.na(df$hla_a) | df$hla_a == "" ~ NA_real_,
+    df$pres_2DS4 & (grepl("01[:]02",df$hla_c) | 
+                      grepl("02[:]02",df$hla_c) | 
+                      grepl("05[:]01",df$hla_c) |
+                      grepl("14[:]02",df$hla_c) |
+                      grepl("16[:]01",df$hla_c) |
+                      grepl("11[:]01",df$hla_a) |
+                      grepl("11[:]02",df$hla_a)) ~ 1,
+    TRUE ~ 0
+  )
+  
+  # 2DS5 is no longer usead, instead:
+  # 3DS1 ligant is Bw4-80T or HLA-B 27:05
+  df$kir3ds1_ligand <- case_when(
+    is.na(df$pres_3DS1) | df$pres_3DS1 == "" ~ NA_real_,
+    is.na(df$B_class) | df$B_class == "" ~ NA_real_,
+    is.na(df$hla_b) | df$hla_b == "" ~ NA_real_,
+    df$pres_3DS1 & grepl("80T", df$B_class) ~ 1,
+    df$pres_3DS1 & grepl("27[:]05",df$hla_b) ~ 1,
+    TRUE ~ 0
+  )
+  
+ df$ikir_score_v2 = df$kir2dl1_ligand + df$kir2dl2_ligand_v2 + df$kir2dl3_ligand_v2 + 
+   df$kir3dl1_ligand + df$kir3dl2_ligand
+ df$akir_score_v2 = df$kir2ds1_ligand_v2 + df$kir2ds2_ligand_v2 + df$kir2ds4_ligand_v2 + df$kir3ds1_ligand
+ 
+ 
+ df$rafei_inh_kl_matches_2cat = ifelse(df$ikir_score_v2 >= 3, ">=3", "<3")
+ df$rafei_act_kl_matches_2cat = ifelse(df$akir_score_v2 >= 1, ">=1", "0")
+ df$rafei_inact_kl_matches_2cat = ifelse((df$ikir_score_v2 >= 3 & df$akir_score_v2 == 0), "unfav", "fav")
+
+ return(df %>% select(starts_with("rafei")))
+ 
+}
+

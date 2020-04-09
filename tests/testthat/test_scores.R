@@ -184,6 +184,18 @@ test_that("Krieger score example works", {
           expect_equal(out$wkir_score, 2.78)
           })
 
+test_that("Krieger unknown C or B ligand gives NA", {
+  dat <- data.frame(kir_2DL1 = 1L, kir_2DL2 = 1L, kir_2DL3 = "NEG", 
+                        kir_3DL1 = "NEG", kir_3DL2 = 1L, kir_2DS1 = 1L, kir_2DS2 = "NEG", 
+                        kir_2DS4 = 1L, kir_2DS4N = "NEG", kir_2DS5 = 1L, kir_3DS1 = 1L, 
+                        C_class = c("C1/C1", "unknown"), B_class = c("unknown", "Bw6/Bw4-80T"), A1 = "01:01", 
+                        A2 = "01:01", B1 = "01:01", B2 = "01:01", C1 = "01:01", C2 = "01:01", stringsAsFactors = FALSE)
+  out <- score_krieger(dat)
+  expect_equal(out$kirl_score, c(NA_real_, NA_real_))
+  expect_equal(out$imkir_score, c(NA_real_, NA_real_))
+  expect_equal(out$wkir_score, c(NA_real_, NA_real_))
+})
+
 test_that("Raefi score example works", {
   dat <- structure(list(kir_2DL1 = 1L, kir_2DL2 = 1L, kir_2DL3 = "NEG", 
                         kir_3DL1 = "NEG", kir_3DL2 = 1L, kir_2DS1 = 1L, kir_2DS2 = "NEG", 
@@ -195,6 +207,19 @@ test_that("Raefi score example works", {
   expect_equal(out$rafei_inh_kl_matches_2cat, "<3")
   expect_equal(out$rafei_act_kl_matches_2cat, ">=1")
   expect_equal(out$rafei_inact_kl_matches_2cat, "fav")
+})
+
+
+test_that("Rafei unknown C or B ligand gives NA", {
+  dat <- data.frame(kir_2DL1 = 1L, kir_2DL2 = 1L, kir_2DL3 = "NEG", 
+                    kir_3DL1 = "NEG", kir_3DL2 = 1L, kir_2DS1 = 1L, kir_2DS2 = "NEG", 
+                    kir_2DS4 = 1L, kir_2DS4N = "NEG", kir_2DS5 = 1L, kir_3DS1 = 1L, 
+                    C_class = c("C1/C1", "unknown"), B_class = c("unknown", "Bw6/Bw4-80T"), A1 = "01:01", 
+                    A2 = "01:01", B1 = "01:01", B2 = "01:01", C1 = "01:01", C2 = "01:01", stringsAsFactors = FALSE)
+  out <- score_rafei(dat)
+  expect_equal(out$rafei_inh_kl_matches_2cat, c(NA_character_, NA_character_))
+  expect_equal(out$rafei_act_kl_matches_2cat, c(NA_character_, NA_character_))
+  expect_equal(out$rafei_inact_kl_matches_2cat, c(NA_character_, NA_character_))
 })
 
 test_that("Raefi and Krieger scores match those used in 17-02 analysis", {

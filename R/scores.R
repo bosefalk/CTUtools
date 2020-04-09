@@ -86,7 +86,7 @@ score_boelen_inhib <- function(df, include_3DL1 = FALSE, separate_2DL2_2DL3 = TR
   # 2DL1 is functional if together with HLA-C2
   df$func_2DL1 <- case_when(
     is.na(df$pres_2DL1) | df$pres_2DL1 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     df$pres_2DL1 & grepl("C2", df$C_class) ~ 1, 
     TRUE ~ 0)  
   
@@ -94,7 +94,7 @@ score_boelen_inhib <- function(df, include_3DL1 = FALSE, separate_2DL2_2DL3 = TR
   # weak functional with HLA-C2
   df$func_2DL2 <- case_when(
     is.na(df$pres_2DL2) | df$pres_2DL2 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     is.na(df$B1) | df$B1 == "" ~ NA_real_,
     is.na(df$B2) | df$B2 == "" ~ NA_real_,
     df$pres_2DL2 & (grepl("C1", df$C_class) | 
@@ -106,7 +106,7 @@ score_boelen_inhib <- function(df, include_3DL1 = FALSE, separate_2DL2_2DL3 = TR
   # 2DL3 is functional if together with HLA-C1, B46 or B73
   df$func_2DL3 <- case_when(
     is.na(df$pres_2DL3) | df$pres_2DL3 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     is.na(df$B1) | df$B1 == "" ~ NA_real_,
     is.na(df$B2) | df$B2 == "" ~ NA_real_,
     df$pres_2DL3 & (grepl("C1", df$C_class) | 
@@ -117,7 +117,7 @@ score_boelen_inhib <- function(df, include_3DL1 = FALSE, separate_2DL2_2DL3 = TR
   if (include_3DL1 == TRUE) {
     df$func_3DL1 <- case_when(
       is.na(df$pres_3DL1) | df$pres_3DL1 == "" ~ NA_real_,
-      is.na(df$B_class) | df$B_class == "" ~ NA_real_,
+      is.na(df$B_class) | df$B_class == "" | df$B_class == "unknown" ~ NA_real_,
       df$pres_3DL1 & (grepl("Bw4", df$B_class_B1) | grepl("Bw4", df$B_class_B2)) ~ 1, 
       TRUE ~ 0)
   }
@@ -267,13 +267,13 @@ score_krieger = function(df, count_2DS4N_as_2DS4 = FALSE) {
   # 2DL1 ligand is C2
   df$kir2dl1_ligand <- case_when(
     is.na(df$pres_2DL1) | df$pres_2DL1 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     df$pres_2DL1 & grepl("C2", df$C_class) ~ 1,
     TRUE ~ 0
   )
   df$kir2dl1_missing_ligand <- case_when(
     is.na(df$pres_2DL1) | df$pres_2DL1 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     df$pres_2DL1 & !grepl("C2", df$C_class) ~ 1,
     TRUE ~ 0
   )
@@ -281,13 +281,13 @@ score_krieger = function(df, count_2DS4N_as_2DS4 = FALSE) {
   # 2DL2 ligand is C1
   df$kir2dl2_ligand <- case_when(
     is.na(df$pres_2DL2) | df$pres_2DL2 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     df$pres_2DL2 & grepl("C1", df$C_class) ~ 1,
     TRUE ~ 0
   )
   df$kir2dl2_missing_ligand <- case_when(
     is.na(df$pres_2DL2) | df$pres_2DL2 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     df$pres_2DL2 & !grepl("C1", df$C_class) ~ 1,
     TRUE ~ 0
   )
@@ -295,13 +295,13 @@ score_krieger = function(df, count_2DS4N_as_2DS4 = FALSE) {
   # 2DL3 ligand is C1
   df$kir2dl3_ligand <- case_when(
     is.na(df$pres_2DL3) | df$pres_2DL3 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     df$pres_2DL3 & grepl("C1", df$C_class) ~ 1,
     TRUE ~ 0
   )
   df$kir2dl3_missing_ligand <- case_when(
     is.na(df$pres_2DL3) | df$pres_2DL3 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     df$pres_2DL3 & !grepl("C1", df$C_class) ~ 1,
     TRUE ~ 0
   )
@@ -309,13 +309,13 @@ score_krieger = function(df, count_2DS4N_as_2DS4 = FALSE) {
   # 3DL1 ligand is Bw4
   df$kir3dl1_ligand <- case_when(
     is.na(df$pres_3DL1) | df$pres_3DL1 == "" ~ NA_real_,
-    is.na(df$B_class) | df$B_class == "" ~ NA_real_,
+    is.na(df$B_class) | df$B_class == "" | df$B_class == "unknown" ~ NA_real_,
     df$pres_3DL1 & grepl("Bw4", df$B_class) ~ 1,
     TRUE ~ 0
   )
   df$kir3dl1_missing_ligand <- case_when(
     is.na(df$pres_3DL1) | df$pres_3DL1 == "" ~ NA_real_,
-    is.na(df$B_class) | df$B_class == "" ~ NA_real_,
+    is.na(df$B_class) | df$B_class == "" | df$B_class == "unknown" ~ NA_real_,
     df$pres_3DL1 & !grepl("Bw4", df$B_class) ~ 1,
     TRUE ~ 0
   )
@@ -337,7 +337,7 @@ score_krieger = function(df, count_2DS4N_as_2DS4 = FALSE) {
   # 2DS1 ligand is C2
   df$kir2ds1_ligand <- case_when(
     is.na(df$pres_2DS1) | df$pres_2DS1 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     df$pres_2DS1 & grepl("C2", df$C_class) ~ 1,
     TRUE ~ 0
   )
@@ -361,7 +361,7 @@ score_krieger = function(df, count_2DS4N_as_2DS4 = FALSE) {
   # 2DS5 ligand is C2
   df$kir2ds5_ligand <- case_when(
     is.na(df$pres_2DS4) | df$pres_2DS4 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     df$pres_2DS5 & grepl("C2", df$C_class) ~ 1,
     TRUE ~ 0
   )
@@ -437,7 +437,7 @@ score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
   # 2DL1 ligand is same as Krieger score, C2
   df$kir2dl1_ligand <- case_when(
     is.na(df$pres_2DL1) | df$pres_2DL1 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     df$pres_2DL1 & grepl("C2", df$C_class) ~ 1,
     TRUE ~ 0
   )
@@ -445,7 +445,7 @@ score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
   # 2DL2 ligand v2 is C1 or B46:01 or B73:01 are present
   df$kir2dl2_ligand_v2 <- case_when(
     is.na(df$pres_2DL2) | df$pres_2DL2 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     is.na(df$hla_b) | df$hla_b == "" ~ NA_real_,
     df$pres_2DL2 & grepl("C1", df$C_class) ~ 1,
     df$pres_2DL2 & (grepl("46[:]01",df$hla_b) | grepl("73[:]01",df$hla_b)) ~ 1,
@@ -455,7 +455,7 @@ score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
   # 2DL3 ligand is 2 if both if both C1 and B46:01 or B73:01 are present, 1 if only either C1 or the HLA-B alleles are present and 0 otherwise
   df$kir2dl3_ligand_v2 <- case_when(
     is.na(df$pres_2DL3) | df$pres_2DL3 == "" ~ NA_real_,
-    is.na(df$C_class) | df$C_class == "" ~ NA_real_,
+    is.na(df$C_class) | df$C_class == "" | df$C_class == "unknown" ~ NA_real_,
     is.na(df$hla_b) | df$hla_b == "" ~ NA_real_,
     df$pres_2DL3 & grepl("C1", df$C_class) & (grepl("46[:]01",df$hla_b) | grepl("73[:]01",df$hla_b)) ~ 2,
     df$pres_2DL3 & grepl("C1", df$C_class) ~ 1,
@@ -466,7 +466,7 @@ score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
   # 3DL1 ligand is same as Krieger, Bw4
   df$kir3dl1_ligand <- case_when(
     is.na(df$pres_3DL1) | df$pres_3DL1 == "" ~ NA_real_,
-    is.na(df$B_class) | df$B_class == "" ~ NA_real_,
+    is.na(df$B_class) | df$B_class == "" | df$B_class == "unknown" ~ NA_real_,
     df$pres_3DL1 & grepl("Bw4", df$B_class) ~ 1,
     TRUE ~ 0
   )
@@ -519,7 +519,7 @@ score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
   # 3DS1 ligant is Bw4-80T or HLA-B 27:05
   df$kir3ds1_ligand <- case_when(
     is.na(df$pres_3DS1) | df$pres_3DS1 == "" ~ NA_real_,
-    is.na(df$B_class) | df$B_class == "" ~ NA_real_,
+    is.na(df$B_class) | df$B_class == "" | df$B_class == "unknown" ~ NA_real_,
     is.na(df$hla_b) | df$hla_b == "" ~ NA_real_,
     df$pres_3DS1 & grepl("80T", df$B_class) ~ 1,
     df$pres_3DS1 & grepl("27[:]05",df$hla_b) ~ 1,
@@ -531,10 +531,22 @@ score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
  df$akir_score_v2 = df$kir2ds1_ligand_v2 + df$kir2ds2_ligand_v2 + df$kir2ds4_ligand_v2 + df$kir3ds1_ligand
  
  
- df$rafei_inh_kl_matches_2cat = ifelse(df$ikir_score_v2 >= 3, ">=3", "<3")
- df$rafei_act_kl_matches_2cat = ifelse(df$akir_score_v2 >= 1, ">=1", "0")
- df$rafei_inact_kl_matches_2cat = ifelse((df$ikir_score_v2 >= 3 & df$akir_score_v2 == 0), "unfav", "fav")
-
+ df$rafei_inh_kl_matches_2cat = case_when(
+   is.na(df$ikir_score_v2) | is.na(df$akir_score_v2) ~ NA_character_,
+   df$ikir_score_v2 >= 3 ~ ">=3", 
+   TRUE ~ "<3")
+ df$rafei_act_kl_matches_2cat = case_when(
+   is.na(df$ikir_score_v2) | is.na(df$akir_score_v2) ~ NA_character_,
+   df$akir_score_v2 >= 1 ~ ">=1",
+   TRUE ~ "0"
+ )
+   
+  df$rafei_inact_kl_matches_2cat = case_when(
+    is.na(df$ikir_score_v2) | is.na(df$akir_score_v2) ~ NA_character_,
+    (df$ikir_score_v2 >= 3 & df$akir_score_v2 == 0) ~ "unfav",
+    TRUE ~ "fav"
+  )
+    
  return(df %>% select(starts_with("rafei")))
  
 }

@@ -222,34 +222,3 @@ test_that("Rafei unknown C or B ligand gives NA", {
   expect_equal(out$rafei_inact_kl_matches_2cat, c(NA_character_, NA_character_))
 })
 
-test_that("Raefi and Krieger scores match those used in 17-02 analysis", {
-  # Henning wrote the original functions for calculating Raefi and Krieger scores for 17-02, here are exported 20 random samples with their 
-  # scores calculated (without any IDs) - run them through the CTUtools functions and check the scores match
-  dat3 <- read.csv("scores_check.csv", stringsAsFactors = FALSE)
-  # sample 11 in the datafile gives different results for 3DL1 - this is becuase the B_class is "unknown", and the ifelse statements in the
-  # original function counted this as present ligand, but it should be missing ligand as per the new function
-  dat3 <- dat3[-11, ]
-  
-  s_k <- score_krieger(dat3)
-  s_r <- score_rafei(dat3)
-  
-  
-  expect_equal(dat3$kirl_score, s_k$kirl_score)
-  expect_equal(dat3$imkir_score, s_k$imkir_score)
-  expect_equal(dat3$wkir_score, s_k$wkir_score)
-  
-  expect_equal(dat3$rafei_inh_kl_matches_2cat, s_r$rafei_inh_kl_matches_2cat)
-  expect_equal(dat3$rafei_act_kl_matches_2cat, s_r$rafei_act_kl_matches_2cat)
-  expect_equal(dat3$rafei_inact_kl_matches_2cat, s_r$rafei_inact_kl_matches_2cat)
-  
-  
-  
-  })
-
-# 
-# dat <- read.csv("tmpdat.csv", stringsAsFactors = FALSE)
-# score_krieger(dat)
-# score_raefi(dat)
-# dat3 <- read.csv("tests/testthat/scores_check.csv", stringsAsFactors = FALSE)
-# score_krieger(dat3)
-# score_raefi(dat3)

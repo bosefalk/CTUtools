@@ -534,7 +534,7 @@ score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
  df$rafei_inh_kl_matches_2cat = case_when(
    is.na(df$ikir_score_v2) | is.na(df$akir_score_v2) ~ NA_character_,
    df$ikir_score_v2 >= 3 ~ ">=3", 
-   TRUE ~ "<3") # fav
+   TRUE ~ "<3")
  df$rafei_act_kl_matches_2cat = case_when(
    is.na(df$ikir_score_v2) | is.na(df$akir_score_v2) ~ NA_character_,
    df$akir_score_v2 >= 1 ~ ">=1",
@@ -543,7 +543,7 @@ score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
    
   df$rafei_inact_kl_matches_2cat = case_when(
     is.na(df$ikir_score_v2) | is.na(df$akir_score_v2) ~ NA_character_,
-    df$ikir_score_v2 >= 3 | df$akir_score_v2 == 0 ~ "unfav",
+    (df$ikir_score_v2 >= 3 & df$akir_score_v2 == 0) ~ "unfav",
     TRUE ~ "fav"
   )
     

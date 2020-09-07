@@ -57,3 +57,56 @@ test_that("KIR_present examples work", {
   
   
 })
+
+context("KIR haplotypes Cen and Tel")
+
+test_that("KIR_haplotype_Cen examples work", {
+  dat <- data.frame(kir_2DL3 = c("001", "NEG", NA, "001|002+003"), 
+                    kir_2DS2 = c("001", "001", "001", "001"), 
+                    kir_2DL2 = c("NEG", "001", "NEG", "NEG"), 
+                    stringsAsFactors = FALSE)
+  expect_equal(KIR_haplotype_Cen(dat, "kir_2DL3", "kir_2DS2", "kir_2DL2"), 
+               c("A/B", "B/B", NA, "A/B"))
+  expect_error(KIR_haplotype_Cen(dat, "kir_2DL3", "kir_2DS2", "kir_2DL2", present_cols = TRUE))
+  dat_string <- data.frame(kir_2DL3 = c("001", "NEG", NA, "001|002+003"), 
+                    kir_2DS2 = c("001", "001", "001", "001"), 
+                    kir_2DL2 = c("NEG", "001", "NEG", "NEG"), 
+                    stringsAsFactors = FALSE)
+  expect_equal(KIR_haplotype_Cen(dat_string, "kir_2DL3", "kir_2DS2", "kir_2DL2"), 
+               c("A/B", "B/B", NA, "A/B"))
+  
+  dat_pres <- data.frame(kir_2DL3 = c(TRUE, FALSE, NA, TRUE), 
+                         kir_2DS2 = c(TRUE, TRUE, TRUE, TRUE), 
+                         kir_2DL2 = c(FALSE, TRUE, FALSE, FALSE), 
+                         stringsAsFactors = FALSE)
+  expect_equal(KIR_haplotype_Cen(dat_pres, "kir_2DL3", "kir_2DS2", "kir_2DL2", present_cols = TRUE), 
+               c("A/B", "B/B", NA, "A/B"))
+  expect_error(KIR_haplotype_Cen(dat_pres, "kir_2DL3", "kir_2DS2", "kir_2DL2", present_cols = FALSE))
+})
+
+test_that("KIR_haplotype_Tel examples work", {
+  dat <- data.frame(kir_3DL1 = c("001", "NEG", NA, "001|002+003"), 
+                    kir_2DS4 = c("001", "001", "001", "001"), 
+                    kir_3DS1 = c("NEG", "001", "NEG", "NEG"),
+                    kir_2DS1 = c("001", "001", "NEG", "NEG"),
+                    stringsAsFactors = FALSE)
+  expect_equal(KIR_haplotype_Tel(dat, "kir_3DL1", "kir_2DS4", "kir_3DS1", "kir_2DS1"), 
+               c("A/B", "B/B", NA, "A/A"))
+  expect_error(KIR_haplotype_Tel(dat, "kir_3DL1", "kir_2DS4", "kir_3DS1", "kir_2DS1", present_cols = TRUE))
+  dat_string <- data.frame(kir_3DL1 = c("001", "NEG", NA, "001|002+003"), 
+                    kir_2DS4 = c("001", "001", "001", "001"), 
+                    kir_3DS1 = c("NEG", "001", "NEG", "NEG"),
+                    kir_2DS1 = c("001", "001", "NEG", "NEG"),
+                    stringsAsFactors = TRUE)
+  expect_equal(KIR_haplotype_Tel(dat_string, "kir_3DL1", "kir_2DS4", "kir_3DS1", "kir_2DS1"), 
+               c("A/B", "B/B", NA, "A/A"))
+  
+  dat_pres <- data.frame(kir_3DL1 = c(TRUE, FALSE, NA, TRUE), 
+                         kir_2DS4 = c(TRUE, TRUE, TRUE, TRUE), 
+                         kir_3DS1 = c(FALSE, TRUE, FALSE, FALSE),
+                         kir_2DS1 = c(TRUE, TRUE, FALSE, FALSE),
+                         stringsAsFactors = FALSE)
+  expect_equal(KIR_haplotype_Tel(dat_pres, "kir_3DL1", "kir_2DS4", "kir_3DS1", "kir_2DS1", present_cols = TRUE), 
+               c("A/B", "B/B", NA, "A/A"))
+  expect_error(KIR_haplotype_Tel(dat_pres, "kir_3DL1", "kir_2DS4", "kir_3DS1", "kir_2DS1", present_cols = FALSE))
+})

@@ -285,3 +285,139 @@ KIR_present <- function(string) {
     TRUE ~ TRUE) # Otherwise present
   return(out)
 }
+
+
+
+
+#' KIR Centromeric Haplotype
+#' 
+#' Assigns the Centrometic haplotype (A/A, A/B or B/B) given a set of KIRs
+#'
+#' @param df data.frame with KIR alleles string as columns
+#' @param KIR_2DL3col string, name of 2DL3 column
+#' @param KIR_2DS2col string, name of 2DS2 column
+#' @param KIR_2DL2col string, name of 2DL2 column
+#' @param present_cols Default is FALSE which assumes the KIR columns contains the allele string ("001", "NEG" etc), and the presence / absence is calculated inside the function using \code{\link{KIR_present}}. If set to TRUE, the KIR columns already contain TRUE/FALSE for presence/absence for all KIRs. 
+#'
+#' @return string vector with haplotype ("A/A", "A/B", "B/B"), NA if any input KIR is missing, and "unknown" otherwise.
+#'
+#' @seealso \code{\link{KIR_haplotype_Tel}}
+#' @examples
+#' dat <- data.frame(kir_2DL3 = c("001", "NEG", NA, "001|002+003"), 
+#'    kir_2DS2 = c("001", "001", "001", "001"), 
+#'    kir_2DL2 = c("NEG", "001", "NEG", "NEG"), 
+#'    stringsAsFactors = FALSE)
+#' KIR_haplotype_Cen(dat, "kir_2DL3", "kir_2DS2", "kir_2DL2")
+#' 
+#' dat_pres <- data.frame(kir_2DL3 = c(TRUE, FALSE, NA, TRUE), 
+#'    kir_2DS2 = c(TRUE, TRUE, TRUE, TRUE), 
+#'    kir_2DL2 = c(FALSE, TRUE, FALSE, FALSE), 
+#'    stringsAsFactors = FALSE)
+#' KIR_haplotype_Cen(dat_pres, "kir_2DL3", "kir_2DS2", "kir_2DL2", present_cols = TRUE)
+KIR_haplotype_Cen <- function(df, KIR_2DL3col, KIR_2DS2col, KIR_2DL2col, present_cols = FALSE) {
+  
+  if (present_cols == FALSE) {
+    if (any(class(df[[KIR_2DL3col]]) == "logical", 
+            class(df[[KIR_2DS2col]]) == "logical",
+            class(df[[KIR_2DL2col]]) == "logical")) {
+      stop("KIR columns are not 'logical' type but present_cols was set to TRUE")
+    }
+    kir2DL3_present <- CTUtools::KIR_present(as.character(df[[KIR_2DL3col]]))
+    kir2DS2_present <- CTUtools::KIR_present(as.character(df[[KIR_2DS2col]]))
+    kir2DL2_present <- CTUtools::KIR_present(as.character(df[[KIR_2DL2col]]))
+  }
+  if (present_cols == TRUE) {
+    if (any(class(df[[KIR_2DL3col]]) != "logical", 
+            class(df[[KIR_2DS2col]]) != "logical",
+            class(df[[KIR_2DL2col]]) != "logical")) {
+      stop("KIR columns are not 'logical' type but present_cols was set to TRUE")
+    }
+    kir2DL3_present <- df[[KIR_2DL3col]]
+    kir2DS2_present <- df[[KIR_2DS2col]]
+    kir2DL2_present <- df[[KIR_2DL2col]]
+  }
+  
+  out <- case_when(
+    is.na(kir2DL3_present) | is.na(kir2DS2_present) | is.na(kir2DL2_present) ~ NA_character_,
+    kir2DL3_present == "" | kir2DS2_present == "" | kir2DL2_present == "" ~ NA_character_,
+    (kir2DL3_present == TRUE & kir2DS2_present == FALSE & kir2DL2_present == FALSE) ~ "A/A",
+    (kir2DL3_present == TRUE & (kir2DS2_present == TRUE | kir2DL2_present == TRUE)) ~ "A/B",
+    (kir2DL3_present == FALSE & (kir2DS2_present == TRUE | kir2DL2_present == TRUE)) ~ "B/B",
+    TRUE ~ "unknown"
+  )
+  
+  return(out)
+  
+}
+
+
+#' KIR Telomeric Haplotype
+#' 
+#' Assigns the Telomeric haplotype (A/A, A/B or B/B) given a set of KIRs
+#'
+#' @param df data.frame with KIR alleles string as columns
+#' @param KIR_3DL1col string, name of 3DL1 column
+#' @param KIR_2DS4col string, name of 2DS4 column
+#' @param KIR_3DS1col string, name of 3DS1 column
+#' @param KIR_2DS1col string, name of 2DS1 column
+#' @param present_cols Default is FALSE which assumes the KIR columns contains the allele string ("001", "NEG" etc), and the presence / absence is calculated inside the function using \code{\link{KIR_present}}. If set to TRUE, the KIR columns already contain TRUE/FALSE for presence/absence for all KIRs. 
+#'
+#' @return string vector with haplotype ("A/A", "A/B", "B/B"), NA if any input KIR is missing, and "unknown" otherwise.
+#'
+#' @seealso \code{\link{KIR_haplotype_Cen}}
+#' @examples
+#' dat <- data.frame(kir_3DL1 = c("001", "NEG", NA, "001|002+003"), 
+#'    kir_2DS4 = c("001", "001", "001", "001"), 
+#'    kir_3DS1 = c("NEG", "001", "NEG", "NEG"),
+#'    kir_2DS1 = c("001", "001", "NEG", "NEG"),
+#'    stringsAsFactors = FALSE)
+#' KIR_haplotype_Tel(dat, "kir_3DL1", "kir_2DS4", "kir_3DS1", "kir_2DS1")
+#'    
+#' dat_pres <- data.frame(kir_3DL1 = c(TRUE, FALSE, NA, TRUE), 
+#'     kir_2DS4 = c(TRUE, TRUE, TRUE, TRUE), 
+#'     kir_3DS1 = c(FALSE, TRUE, FALSE, FALSE),
+#'     kir_2DS1 = c(TRUE, TRUE, FALSE, FALSE),
+#'     stringsAsFactors = FALSE)
+#' KIR_haplotype_Tel(dat_pres, "kir_3DL1", "kir_2DS4", "kir_3DS1", "kir_2DS1", present_cols = TRUE)
+KIR_haplotype_Tel <- function(df, KIR_3DL1col, KIR_2DS4col, KIR_3DS1col, KIR_2DS1col, present_cols = FALSE) {
+  
+  if (present_cols == FALSE) {
+    if (any(class(df[[KIR_3DL1col]]) == "logical", 
+            class(df[[KIR_2DS4col]]) == "logical",
+            class(df[[KIR_3DS1col]]) == "logical",
+            class(df[[KIR_2DS1col]]) == "logical")) {
+      stop("KIR column are 'logical' type but present_cols was set to FALSE")
+    }
+    kir3DL1_present <- CTUtools::KIR_present(as.character(df[[KIR_3DL1col]]))
+    kir2DS4_present <- CTUtools::KIR_present(as.character(df[[KIR_2DS4col]]))
+    kir3DS1_present <- CTUtools::KIR_present(as.character(df[[KIR_3DS1col]]))
+    kir2DS1_present <- CTUtools::KIR_present(as.character(df[[KIR_2DS1col]]))
+  }
+  if (present_cols == TRUE) {
+    if (any(class(df[[KIR_3DL1col]]) != "logical", 
+            class(df[[KIR_2DS4col]]) != "logical",
+            class(df[[KIR_3DS1col]]) != "logical",
+            class(df[[KIR_2DS1col]]) != "logical")) {
+      stop("KIR columns are not 'logical' type but present_cols was set to TRUE")
+    }
+    kir3DL1_present <- df[[KIR_3DL1col]]
+    kir2DS4_present <- df[[KIR_2DS4col]]
+    kir3DS1_present <- df[[KIR_3DS1col]]
+    kir2DS1_present <- df[[KIR_2DS1col]]
+  }
+  
+  
+  
+  out <- case_when(
+    is.na(kir3DL1_present) | is.na(kir2DS4_present) | is.na(kir3DS1_present) | is.na(kir2DS1_present) ~ NA_character_,
+    kir3DL1_present == "" | kir2DS4_present == "" | kir3DS1_present == "" | kir2DS1_present == "" ~ NA_character_,
+    (kir3DL1_present == TRUE & kir2DS4_present == TRUE) & (kir3DS1_present == FALSE & kir2DS1_present == FALSE) ~ "A/A",
+    (kir3DL1_present == TRUE & kir2DS4_present == TRUE) & (kir3DS1_present == TRUE | kir2DS1_present == TRUE) ~ "A/B",
+    (kir3DL1_present == FALSE | kir2DS4_present == FALSE) ~ "B/B",
+    TRUE ~ "unknown"
+  )
+  
+  return(out)
+  
+}
+

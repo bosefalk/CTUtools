@@ -48,6 +48,8 @@ Common R functions and reference data used by DKMS CTU.
 \code{\link{NMDP}}: Reference data for expanding NMDP codes
 
 \code{\link{ASSIGN_KIR3DL1}}: KIR3DL1/HLA-B Subtypes, from Bodreau et al
+
+\code{\link{Superclass_HLA}}: Superclass allele assignment for HLA-A and HLA-B
 }
 
 \section{Location}{

@@ -46,4 +46,18 @@ test_that("HLA_Classification examples work", {
   
 })
 
+context("HLA Supertypes")
+
+test_that("HLA supertype examples work", {
+  dat <- structure(list(A_allele = c("01:01", "01:99", NA, "01:13"), B_allele = c("07:02", 
+                                                                                  "02:99", NA, "07:10")), class = "data.frame", row.names = c(NA, 
+                                                                                                                                              -4L))
+  expect_equal(HLA_Supertype(dat$A_allele, HLA = "A"), c("A01", "Unknown", NA, "Unclassified"))
+  expect_equal(HLA_Supertype(dat$B_allele, HLA = "B"), c("B07", "Unknown", NA, "Unclassified"))
+  
+  dat_factor <- data.frame(A_allele = c("01:01", "01:99", NA, "01:13"), B_allele = c("07:02", "02:99", NA, "07:10"), stringsAsFactors = TRUE)
+  expect_equal(HLA_Supertype(dat_factor$A_allele, HLA = "A"), c("A01", "Unknown", NA, "Unclassified"))
+  expect_equal(HLA_Supertype(dat_factor$B_allele, HLA = "B"), c("B07", "Unknown", NA, "Unclassified"))
+})
+
 

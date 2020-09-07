@@ -16,6 +16,8 @@
 #' 
 #' \code{\link{KIR3DL1_3DS1_assignment}}: Classifies KIR 3DL1 & 3DS1 alleles into KIR3DL1-H, -L, -N
 #' 
+#' \code{\link{HLA_Supertype}}: Assigns a HLA allele to its Supertype (A01, A02 A24 etc)
+#' 
 #' @section Score functions:
 #' 
 #' \code{\link{score_boelen_inhib}}: Boelen inhibitory score calculation
@@ -33,6 +35,8 @@
 #' \code{\link{NMDP}}: Reference data for expanding NMDP codes
 #'
 #' \code{\link{ASSIGN_KIR3DL1}}: KIR3DL1/HLA-B Subtypes, from Bodreau et al
+#' 
+#' \code{\link{Superclass_HLA}}: Superclass allele assignment for HLA-A and HLA-B
 #'
 #' @section Location:
 #'

@@ -236,3 +236,40 @@ HLA_B_classification = function(allele_b1, allele_b2, fields = 2, HLA_B_class = 
   return(out)
   
 }
+
+
+#' Assign HLA alleles to Supertype
+#' 
+#' Assigns a HLA allele to its Supertype (A01, A02 A24 etc). Allele which are classified as Unassigned in the paper are "Unassigned", alleles which do not
+#' appear in the paper at all are given "Unknown".
+#'
+#' @param allele HLA allele string vector as character, two fields only
+#' @param HLA "A" for HLA-A, "B" for HLA-B
+#'
+#' @return string vector with Supertype assignment for each row
+#' 
+#' @source \url{http://www.biomedcentral.com/1471-2172/9/1}
+#' 
+#' @examples
+#' dat <- data.frame(A_allele = c("01:01", "01:99", NA, "01:13"), 
+#'        B_allele = c("07:02", "02:99", NA, "07:10"), stringsAsFactors = FALSE)
+#' HLA_Supertype(dat$A_allele, HLA = "A")
+#' HLA_Supertype(dat$B_allele, HLA = "B")
+HLA_Supertype <- function(allele, HLA) {
+  if (!HLA %in% c("A", "B")) {
+    stop("HLA input parameter must be either A or B")
+  }
+  .HLA <- HLA
+  super <- Supertype_HLA_lookup %>% filter(HLA == .HLA) %>% select(-HLA)
+  
+  .allele <- data.frame(allele = as.character(allele), stringsAsFactors = FALSE)
+  with_super <- left_join(.allele, super, by = c("allele" = "Allele"))
+  
+  with_super <- with_super %>% mutate(Supertype = ifelse(is.na(Supertype) & (allele != "" & allele != " " & !is.na(allele)), "Unknown", Supertype))
+  
+  out <- with_super$Supertype
+  return(out)
+  
+  
+  }
+

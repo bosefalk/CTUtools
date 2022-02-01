@@ -393,11 +393,16 @@ score_krieger = function(df, count_2DS4N_as_2DS4 = FALSE) {
 #' * HLA-A, B and C allele string, either as one column named "hla_a", or as two "A1" "A2"
 #' * C- and B- ligand class column, named "B_class" & "C_class" (or "hla_c_class.pat")
 #' @param count_2DS4N_as_2DS4 Default FALSE, if set to TRUE 2DS4 is considered present if 2DS4 or 2DS4N is present
+#' @param return_numeric Default FALSE, if set to TRUE returns the raw inhibitory and activating KIR scores also
 #'
-#' @return data.frame with the following columns, all as numeric:
+#' @return data.frame with the following columns, all as character:
 #' * rafei_inh_kl_matches_2cat
 #' * rafei_act_kl_matches_2cat
 #' * rafei_inact_kl_matches_2cat
+#' 
+#' If return_numeric is TRUE, also returns, as numeric:
+#' * rafei_inh_ikir_numeric
+#' * rafei_act_akir_numeric
 #' 
 #' @export
 #' @md
@@ -413,7 +418,8 @@ score_krieger = function(df, count_2DS4N_as_2DS4 = FALSE) {
 #' A2 = "01:01", B1 = "01:01", B2 = "01:01", C1 = "01:01", C2 = "01:01"), class = "data.frame", row.names = c(NA, 
 #'                                                                                                           -1L))
 #' score_rafei(dat)
-score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
+#' score_rafei(dat, return_numeric = TRUE)
+score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE, return_numeric = FALSE) {
   
   df <- map_score_df(df)
   
@@ -530,7 +536,7 @@ score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
    df$kir3dl1_ligand + df$kir3dl2_ligand
  df$akir_score_v2 = df$kir2ds1_ligand_v2 + df$kir2ds2_ligand_v2 + df$kir2ds4_ligand_v2 + df$kir3ds1_ligand
  
- 
+ # columns as factors with cut-offs:
  df$rafei_inh_kl_matches_2cat = case_when(
    is.na(df$ikir_score_v2) | is.na(df$akir_score_v2) ~ NA_character_,
    df$ikir_score_v2 >= 3 ~ ">=3", 
@@ -547,6 +553,20 @@ score_rafei <- function(df, count_2DS4N_as_2DS4 = FALSE) {
     TRUE ~ "fav"
   )
     
+  
+  # Columns with numeric as cut-off
+  if (return_numeric == TRUE) {
+    df$rafei_inh_ikir_numeric <- case_when(
+      is.na(df$ikir_score_v2) | is.na(df$akir_score_v2) ~ NA_real_,
+      TRUE ~ df$ikir_score_v2
+      )
+    
+    df$rafei_act_akir_numeric <- case_when(
+      is.na(df$ikir_score_v2) | is.na(df$akir_score_v2) ~ NA_real_,
+      TRUE ~ df$akir_score_v2
+    )
+  }
+  
  return(df %>% select(starts_with("rafei")))
  
 }

@@ -4,10 +4,12 @@
 \name{NMDP}
 \alias{NMDP}
 \title{NMDP allele codes}
-\format{\describe{
+\format{
+\describe{
   \item{nmdp_codes}{NMDP code}
   \item{Allele}{Component alleles, separated by "/"}
-}}
+}
+}
 \source{
 \url{https://bioinformatics.bethematchclinical.org/hla-resources/allele-codes/allele-code-lists/allele-code-list-in-alphabetical-order/}
 }

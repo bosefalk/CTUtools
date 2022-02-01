@@ -4,11 +4,13 @@
 \name{Supertype_HLA_lookup}
 \alias{Supertype_HLA_lookup}
 \title{Superclass HLA lookup}
-\format{\describe{
+\format{
+\describe{
   \item{Allele}{HLA allele}
   \item{Supertype}{Supertype}
   \item{HLA}{A for HLA-A, B for HLA-B allele}
-}}
+}
+}
 \source{
 \url{http://www.biomedcentral.com/1471-2172/9/1}
 }

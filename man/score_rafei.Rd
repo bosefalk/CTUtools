@@ -8,7 +8,7 @@ Rafei et al, Role of killer cell immunoglobulin-like receptor (KIR)-ligand inter
 Journal of Clinical Oncology 37, https://ascopubs.org/doi/abs/10.1200/JCO.2019.37.15_suppl.7049
 }
 \usage{
-score_rafei(df, count_2DS4N_as_2DS4 = FALSE)
+score_rafei(df, count_2DS4N_as_2DS4 = FALSE, return_numeric = FALSE)
 }
 \arguments{
 \item{df}{data.frame with the following columns:
@@ -19,13 +19,21 @@ score_rafei(df, count_2DS4N_as_2DS4 = FALSE)
 }}
 
 \item{count_2DS4N_as_2DS4}{Default FALSE, if set to TRUE 2DS4 is considered present if 2DS4 or 2DS4N is present}
+
+\item{return_numeric}{Default FALSE, if set to TRUE returns the raw inhibitory and activating KIR scores also}
 }
 \value{
-data.frame with the following columns, all as numeric:
+data.frame with the following columns, all as character:
 \itemize{
 \item rafei_inh_kl_matches_2cat
 \item rafei_act_kl_matches_2cat
 \item rafei_inact_kl_matches_2cat
+}
+
+If return_numeric is TRUE, also returns, as numeric:
+\itemize{
+\item rafei_inh_ikir_numeric
+\item rafei_act_akir_numeric
 }
 }
 \description{
@@ -40,4 +48,5 @@ C_class = "C1/C1", B_class = "Bw6/Bw4-80T", A1 = "01:01",
 A2 = "01:01", B1 = "01:01", B2 = "01:01", C1 = "01:01", C2 = "01:01"), class = "data.frame", row.names = c(NA, 
                                                                                                           -1L))
 score_rafei(dat)
+score_rafei(dat, return_numeric = TRUE)
 }

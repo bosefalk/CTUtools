@@ -184,6 +184,7 @@ test_that("Krieger score example works", {
           expect_equal(out$wkir_score, 2.78)
           })
 
+
 test_that("Krieger unknown C or B ligand gives NA", {
   dat <- data.frame(kir_2DL1 = 1L, kir_2DL2 = 1L, kir_2DL3 = "NEG", 
                         kir_3DL1 = "NEG", kir_3DL2 = 1L, kir_2DS1 = 1L, kir_2DS2 = "NEG", 
@@ -207,6 +208,21 @@ test_that("Raefi score example works", {
   expect_equal(out$rafei_inh_kl_matches_2cat, "<3")
   expect_equal(out$rafei_act_kl_matches_2cat, ">=1")
   expect_equal(out$rafei_inact_kl_matches_2cat, "fav")
+})
+
+test_that("Raefi score example with return_numeric", {
+  dat <- structure(list(kir_2DL1 = 1L, kir_2DL2 = 1L, kir_2DL3 = "NEG", 
+                        kir_3DL1 = "NEG", kir_3DL2 = 1L, kir_2DS1 = 1L, kir_2DS2 = "NEG", 
+                        kir_2DS4 = 1L, kir_2DS4N = "NEG", kir_2DS5 = 1L, kir_3DS1 = 1L, 
+                        C_class = "C1/C1", B_class = "Bw6/Bw4-80T", A1 = "01:01", 
+                        A2 = "01:01", B1 = "01:01", B2 = "01:01", C1 = "01:01", C2 = "01:01"), class = "data.frame", row.names = c(NA, 
+                                                                                                                                   -1L))
+  out <- score_rafei(dat, return_numeric = TRUE)
+  expect_equal(out$rafei_inh_kl_matches_2cat, "<3")
+  expect_equal(out$rafei_act_kl_matches_2cat, ">=1")
+  expect_equal(out$rafei_inact_kl_matches_2cat, "fav")
+  expect_equal(out$rafei_inh_ikir_numeric, 1)
+  expect_equal(out$rafei_act_akir_numeric, 1)
 })
 
 

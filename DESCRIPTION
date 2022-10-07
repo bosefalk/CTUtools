@@ -12,6 +12,7 @@ RoxygenNote: 7.0.2
 Depends:
   plyr, 
   dplyr, 
-  openssl
+  openssl,
+  readxl
 Suggests: 
     testthat

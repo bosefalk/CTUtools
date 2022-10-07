@@ -55,3 +55,17 @@
 #' @seealso \code{\link{KIR3DL1_3DS1_assignment}}
 #' @source Boudreau et al. Journal of Clinical Oncology 2017 35:20, 2268-2278
 "ASSIGN_KIR3DL1"
+
+#' Superclass HLA lookup
+#'
+#' Superclass HLA allele assignments, column HLA equal to "A" for HLA-A, "B" for HLA-B
+#' 
+#' @format
+#' \describe{
+#'   \item{Allele}{HLA allele}
+#'   \item{Supertype}{Supertype}
+#'   \item{HLA}{A for HLA-A, B for HLA-B allele}
+#' }
+#'
+#' @source \url{http://www.biomedcentral.com/1471-2172/9/1}
+"Supertype_HLA_lookup"

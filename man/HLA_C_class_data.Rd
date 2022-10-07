@@ -4,10 +4,12 @@
 \name{HLA_C_class_data}
 \alias{HLA_C_class_data}
 \title{HLA-C C1/C2 ligand classification database}
-\format{\describe{
+\format{
+\describe{
   \item{Allele}{HLA-C allele, in format "C*01:02:01:04"}
   \item{Predicted Ligand}{Predicted Ligand, "C1" or "C2"}
-}}
+}
+}
 \source{
 \url{https://www.ebi.ac.uk/cgi-bin/ipd/kir/retrieve_ligands.cgi?C}
 }

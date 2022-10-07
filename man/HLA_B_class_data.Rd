@@ -4,10 +4,12 @@
 \name{HLA_B_class_data}
 \alias{HLA_B_class_data}
 \title{HLA-B Bw4/Bw6-80I/T ligand classification database}
-\format{\describe{
+\format{
+\describe{
   \item{Allele}{HLA-B allele, in format "B*01:02:01:04"}
   \item{Predicted Ligand}{Predicted Ligand, "Bw6", "Bw4 - 80I" or "Bw4 - 80T"}
-}}
+}
+}
 \source{
 \url{https://www.ebi.ac.uk/cgi-bin/ipd/kir/retrieve_ligands.cgi?B}
 }

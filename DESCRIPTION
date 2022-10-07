@@ -1,14 +1,14 @@
 Package: CTUtools
 Type: Package
 Title: Common R functions for DKMS CTU
-Version: 0.1.8
+Version: 0.2.3
 Author: Bose Falk
 Maintainer: Bose Falk <falk@dkms.de>
 Description: Common R functions and reference data used by DKMS CTU.
 License: file LICENSE
 Encoding: UTF-8
 LazyData: false
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 Depends:
   plyr, 
   dplyr, 

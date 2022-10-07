@@ -4,10 +4,12 @@
 \name{ASSIGN_KIR3DL1}
 \alias{ASSIGN_KIR3DL1}
 \title{KIR3DL1/HLA-B Subtypes}
-\format{\describe{
+\format{
+\describe{
   \item{Allele}{KIR3DL1 allele}
   \item{Class}{Allele classification. 0 means unclassified}
-}}
+}
+}
 \source{
 Boudreau et al. Journal of Clinical Oncology 2017 35:20, 2268-2278
 }
